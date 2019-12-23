@@ -70,7 +70,7 @@
         v-if="isModalVisible"
         @close="closeModal"
         @cancel="isModalVisible = false"
-        :disable-save="board.title.length< 5"
+        :disable-save="false"
       >
         <template v-slot:body>
           <sy-input full class="mb-10">
