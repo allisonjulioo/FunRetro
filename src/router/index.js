@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import MinhasRetros from '../views/MinhasRetros.vue'
 import CreateBoard from '../views/CreateRetro.vue'
-import Login from '../views/Login.vue'
+import LoginComponent from '../views/Login.vue'
 import Axios from 'axios'
 
 Vue.prototype.$http = Axios
@@ -23,11 +23,11 @@ const routes = [
   {
     path: '/login',
     name: 'login',
-    component: Login
+    component: LoginComponent
   },
   {
     path: '**',
-    component: MinhasRetros
+    component: LoginComponent
   }
 ]
 

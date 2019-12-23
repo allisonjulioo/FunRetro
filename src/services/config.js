@@ -1,3 +1,3 @@
 export default {
-  apiUrl: 'http://192.168.0.113:8000'
+  apiUrl: 'https://hidden-sierra-94503.herokuapp.com'
 }
