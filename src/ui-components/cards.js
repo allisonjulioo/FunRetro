@@ -19,8 +19,8 @@ export const SyCard = styled('div', CardOption)`
   }`
     : '')};
   width: 100%;
-  min-height: 155px;
-  padding: 16px 24px; 
+  min-height: 170px;
+  padding: 16px 24px;
   margin-bottom: 24px;
   border: 1px solid #eeeeee;
   border-radius: 5px;
@@ -36,10 +36,10 @@ export const SyCard = styled('div', CardOption)`
     *{
       user-select: none;
     }
-    &:hover{ 
+    &:hover{
       border: 2px dashed ${bgColor.primary};
     }
-    &:active{ 
+    &:active{
       border: 2px dashed ${bgColor.primary} !important;
       background-color: #f2f2f2;
     }`
@@ -53,8 +53,8 @@ export const SyCard = styled('div', CardOption)`
   }
   p, span{
     color: ${txtColor.quartz};
-    font-size: 12px; 
-  } 
+    font-size: 12px;
+  }
 `;
 
 export const SySuccessCard = styled.div`

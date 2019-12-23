@@ -8,6 +8,7 @@ export const global = injectGlobal`
   body {
       background: #f5f5f5;
       margin: 0;
+      padding-bottom: 60px;
   }
   *{
       font-family: 'Open Sans', sans-serif;
@@ -40,5 +41,5 @@ export const global = injectGlobal`
   display: flex;
   align-items:center;
   justify-content: space-between;
-} 
+}
 `;

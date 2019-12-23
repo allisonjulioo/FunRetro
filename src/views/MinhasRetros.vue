@@ -8,7 +8,7 @@
           <sy-button @click="showModal">+ Adicionar novo board</sy-button>
         </sy-title>
         <Row>
-          <sy-card clickable def @click="showModal" class="con-cards" v-if="!retros.length">
+          <sy-card clickable def @click="showModal" class="con-cards" v-if="!boards.length">
             <img class="empty-boards" src="../assets/empty.png" alt />
             <sy-title>
               Não há nada por aqui!
@@ -18,47 +18,47 @@
           <sy-card
             clickable
             hover
-            class="retros"
-            v-for="(retro, index) in retros"
-            :key="index"
-            :class="{'editing' : retro.editing}"
+            class="boards"
+            v-for="(board, index) in boards"
+            :key="board.board_id"
+            :class="{'in_voting' : board.in_voting}"
           >
-            <router-link v-if="!retro.editing" class="action-link" to="/retro/1" :col="3">
-              <sy-title black normal>{{retro.name}}</sy-title>
+            <router-link v-if="!board.in_voting" class="action-link" :to="'/board/'+ board.board_id" :col="3">
+              <sy-title black normal>{{board.title}}</sy-title>
               <sy-title black normal sub>
                 Votos por usuário
-                <b>{{retro.votes || '10/01/2019'}}</b>
+                <b>{{board.limit_votes}}</b>
               </sy-title>
               <sy-title black normal sub class="f-2" style="white-space: nowrap">
                 <i class="material-icons mr-2">date_range</i>
-                {{retro.date || '10/01/2019'}} -
+                {{board.created_date | formatDate}} -
                 <span
                   style="color: #0097ff; font-size: 18px;"
                 >Em votação</span>
               </sy-title>
             </router-link>
-            <sy-input v-if="retro.editing" class="on-edit">
+            <sy-input v-if="board.in_voting" class="on-edit">
               <label>Nome</label>
-              <input v-model="retro.name" type="text" />
+              <input v-model="board.title" type="text" />
               <label>Votos por usuário</label>
-              <input type="number" v-model="retro.votes" />
+              <input type="number" v-model="board.limit_votes" />
             </sy-input>
             <div class="actions">
               <!-- Default          -->
-              <section v-if="!retro.editing">
-                <sy-button icon @click="retro.editing = true">
+              <section v-if="!board.in_voting">
+                <sy-button icon @click="board.in_voting = true">
                   <i class="material-icons">edit</i>
                 </sy-button>
                 <sy-button icon>
-                  <i class="material-icons" @click="deleteBoard(index)">delete</i>
+                  <i class="material-icons" @click="deleteBoard(board.board_id)">delete</i>
                 </sy-button>
               </section>
               <!-- On edit          -->
-              <section v-if="retro.editing">
-                <sy-button icon @click="retro.editing = false">
+              <section v-if="board.in_voting">
+                <sy-button icon @click="editBoard(board)">
                   <i class="material-icons">save</i>
                 </sy-button>
-                <sy-button icon @click="retro.editing = false">
+                <sy-button icon @click="board.in_voting = false">
                   <i class="material-icons">cancel</i>
                 </sy-button>
               </section>
@@ -70,20 +70,20 @@
         v-if="isModalVisible"
         @close="closeModal"
         @cancel="isModalVisible = false"
-        :disable-save="retro.name.length< 5"
+        :disable-save="board.title.length< 5"
       >
         <template v-slot:body>
           <sy-input full class="mb-10">
             <label>Nome</label>
-            <input type="text" v-model.trim="retro.name" maxlength="50" />
+            <input type="text" v-model.trim="board.title" maxlength="50" />
             <span
               class="preamble"
-              v-bind:style="[retro.name.length == 50 ? {color : '#ff2948'} : {}]"
-            >{{50 - retro.name.length}} carateres restantes</span>
+              v-bind:style="[board.title.length == 50 ? {color : '#ff2948'} : {}]"
+            >{{50 - board.title.length}} carateres restantes</span>
           </sy-input>
           <sy-input pre-left class="mb-10">
             <label>Votos por usuário</label>
-            <input type="number" v-model="retro.votes" />
+            <input type="number" v-model="board.limit_votes" />
           </sy-input>
         </template>
       </modal>
@@ -94,6 +94,7 @@
 <script>
 import TimeLine from "@/components/Timeline/TimeLine";
 import Modal from "@/components/Modal/Modal";
+import boardService from '@/services/boards'
 
 import {
   SyCard,
@@ -121,30 +122,54 @@ export default {
   data() {
     return {
       isModalVisible: false,
-      retro: {
-        name: "",
-        votes: 6,
-        editing: false
+      board: {
+        title: "",
+        limit_votes: 6,
+        in_voting: false
       },
-      retros: [],
+      boards: [],
       editMode: false
     };
   },
+  computed:{
+    load: async function(){
+      await this.getBoards()
+    },
+  },
+  mounted(){
+    this.load
+  },
   methods: {
+    getBoards() {
+      let vm = this;
+      boardService.getBoards().then(res =>{
+        vm.boards = res.data.boards;
+      })
+    },
     showModal() {
       this.isModalVisible = true;
     },
     closeModal() {
-      this.retros.push(this.retro);
-      this.retro = {
-        name: "",
-        votes: 6,
-        editing: false
-      };
-      this.isModalVisible = false;
+      let vm = this;
+      const data = {
+        title: this.board.title,
+        limit_votes: this.board.limit_votes,
+      }
+      boardService.createBoard(data).then(res => {
+        this.getBoards();
+        vm.isModalVisible = false;
+      })
+
     },
-    deleteBoard(index) {
-      this.retros.splice(index, 1);
+    deleteBoard(id) {
+      boardService.deleteBoard(id).then(res => {
+        this.getBoards();
+      })
+    },
+    editBoard(board) {
+      boardService.updateBoard(board).then(res => {
+        this.getBoards();
+      })
     }
   }
 };
@@ -159,8 +184,8 @@ export default {
     }
   }
 }
-.retros {
-  width: 25%;
+.boards {
+  width: calc(25% - 30px);
   margin-right: 20px;
   max-width: 300px;
   position: relative;
@@ -172,6 +197,11 @@ export default {
     .actions{
       opacity: 1 !important;
     }
+  }
+
+  a > h1{
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
   .action-link {
     display: block;
@@ -203,11 +233,12 @@ export default {
       }
     }
   }
-  &.editing {
-    border: 1px solid #0097ff;
-    box-shadow: 0 4px 24px 1px rgba(0, 0, 0, 0.1);
+  &.in_voting {
+    border: 1px solid #8030ff;
+    box-shadow: 0 4px 24px 1px rgba(128, 48, 255, 0.2);
     .actions {
       opacity: 1 !important;
+        background: #8030ff;
     }
   }
   &:hover {
@@ -230,12 +261,20 @@ export default {
   .empty-boards {
     width: 100%;
   }
+  .container-board{
+    margin: 0;
+  }
   .title {
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     width: 100%;
     button {
-      margin: 1em 0;
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      z-index: 1;
+      font-size: 12px;
+          height: 50px;
     }
   }
 }

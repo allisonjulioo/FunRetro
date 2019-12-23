@@ -63,7 +63,7 @@ export default {
       setTimeout(() => {
         this.$emit("cancel");
         this.classDismiss = false;
-      }, 150); 
+      }, 150);
     }
   }
 };

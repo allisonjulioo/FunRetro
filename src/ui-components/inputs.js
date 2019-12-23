@@ -14,15 +14,15 @@ const inputProps = {
 // Inputs
 // --------------------------
 export const SyInput = styled('label', inputProps)`
-    margin-rigth: 0px; 
-    ${props => (props.date ? 'max-width: 189px !important;' : '')};   
-    ${props => (props.full ? 'width: 100%; display: block' : '')};   
-    ${props => (props.mr ? `margin-right: ${props.mr}px` : '')};   
-    ${props => (props.ml ? `margin-left: ${props.ml}px` : '')};   
-    
+    margin-rigth: 0px;
+    ${props => (props.date ? 'max-width: 189px !important;' : '')};
+    ${props => (props.full ? 'width: 100%; display: block' : '')};
+    ${props => (props.mr ? `margin-right: ${props.mr}px` : '')};
+    ${props => (props.ml ? `margin-left: ${props.ml}px` : '')};
+
       ${props => (props.checkbox ? `
        display: flex;
-       align-items: center; 
+       align-items: center;
        cursor: pointer;
        font-size: 14px;
        color: #50525f;
@@ -37,7 +37,7 @@ export const SyInput = styled('label', inputProps)`
           border: solid 1px ${bgColor.steel};
           width: 15px !important;
           height: 15px !important;
-          border-radius: 3px;  
+          border-radius: 3px;
         }
         input + label {
           display: block;
@@ -45,7 +45,7 @@ export const SyInput = styled('label', inputProps)`
           cursor: pointer;
           padding: 0.2em;
         }
-        
+
         input + label:before {
           content: "v";
           border: 0.1em solid ${bgColor.steel};
@@ -69,7 +69,7 @@ export const SyInput = styled('label', inputProps)`
           border-color: ${bgColor.primary};
           color: #fff;
         }
-      ` : '')};   
+      ` : '')};
       &.diabled{
         opacity: .7;
         *{
@@ -88,24 +88,24 @@ export const SyInput = styled('label', inputProps)`
         color: #50525f;
         display: flex;
         margin-bottom: 2px;
-        small{ 
+        small{
           pading-left: 2px;
-          color: ${bgColor.strawberry}; 
-        }; 
+          color: ${bgColor.strawberry};
+        };
       }
       input{
         padding:12px;
         border: solid 1px ${bgColor.steel};
         width: 100%;
         height: 40px;
-        border-radius: 3px; 
+        border-radius: 3px;
         &.hasError{
           border: solid 1px ${bgColor.strawberry};
           *{
             border: solid 1px ${bgColor.strawberry} !important;
           }
         }
-      }  
+      }
       .hasError{
         input, .mx-input-append{
           border-color: ${bgColor.strawberry} !important;
@@ -113,17 +113,19 @@ export const SyInput = styled('label', inputProps)`
       }
       textarea{
         width: 100%;
-        min-height: 116px;
         padding: 10px;
+        border-radius: 3px;
+        border: none;
+        margin-top: 10px;
       }
-      .alert{ 
-        ${props => (props.a100 ? 'max-width: 100% !important;' : '')}; 
+      .alert{
+        ${props => (props.a100 ? 'max-width: 100% !important;' : '')};
         max-width: 85%;
         display: -webkit-box;
         display: -webkit-flex;
         display: -ms-flexbox;
         display: flex;
-        margin: 4px 0 0; 
+        margin: 4px 0 0;
         font-weight: 600;
         line-height: 1;
         min-width: 0px;
@@ -135,16 +137,16 @@ export const SyInput = styled('label', inputProps)`
         color: ${bgColor.strawberry};
       }
       ${props => (props.preLeft ? `
-      .preamble{ 
+      .preamble{
         float: left !important;
-        text-align: left !important;   
+        text-align: left !important;
       }
       ` : '')};
       .preamble{
         font-size: 12px;
         color: ${bgColor.darkGray};
         float: right;
-        text-align: right; 
+        text-align: right;
         min-height: 24px;
         margin: 4px 0 0;
         margin-bottom: -27px;

@@ -9,11 +9,12 @@
       >Nova coluna</sy-button>
     </div>
     <Container
+      lock-axis="x,y"
       @drop="onDrop($event)"
+      :drag-begin-delay="500"
       orientation="horizontal"
       drag-handle-selector=".column-drag-handle"
       @drag-start="dragStart($event, this)"
-      :drop-placeholder="upperDropPlaceholderOptions"
       class="columns"
     >
       <Draggable
@@ -47,7 +48,7 @@
           @drop="onInnerDrop(column, $event)"
           :drop-placeholder="dropPlaceholderOptions"
         >
-          <Draggable v-for="(item, key) in column.items" :key="key">
+          <Draggable v-for="(item, key) in column.cards" :key="key">
             <sy-card class="draggable-item" v-bind:style="{ backgroundColor : column.color }">
               <inline-edit
                 :label="item.data"
@@ -71,7 +72,12 @@
       </template>
       <template v-slot:body>
         <sy-input full class="mb-10">
-          <textarea autofocus v-model="description" maxlength="50"></textarea>
+          <textarea
+            style="border: 1px solid #929eaa"
+            autofocus
+            v-model="description"
+            maxlength="50"
+          ></textarea>
           <span
             class="preamble"
             v-bind:style="[description.length == 50 ? {color : '#ff2948'} : {}]"
@@ -107,6 +113,7 @@ import {
 } from "@/ui-components";
 import Modal from "@/components/Modal/Modal.vue";
 import InlineEdit from "@/components/InlineEdit/InlineEdit.vue";
+import columnService from "@/services/column";
 
 export default {
   name: "Kanban",
@@ -127,18 +134,7 @@ export default {
       description: "",
       selectedCard: "",
       index: 0,
-      columns: data(),
-      upperDropPlaceholderOptions: {
-        className: "cards-drop-preview",
-        animationDuration: "150",
-        showOnTop: true,
-        dropdown: false
-      },
-      upperDropPlaceholderOptions: {
-        className: "cards-drop-preview",
-        animationDuration: "150",
-        showOnTop: true
-      },
+      columns: [],
       dropPlaceholderOptions: {
         className: "drop-preview",
         animationDuration: "150",
@@ -158,8 +154,15 @@ export default {
       vm.menuBarMobile = size <= 981;
     };
     this.$root.$on("changedElement", event => console.log(event));
+    this.getColumns();
   },
   methods: {
+    getColumns() {
+      const id = this.$route.params.idBoard;
+      columnService.getColumns(id).then(res => {
+        this.columns = res.data.columns;
+      });
+    },
     addColumn() {
       this.columns.length <= 4
         ? this.columns.push({
@@ -167,7 +170,7 @@ export default {
             className: "default",
             title: "Nome",
             color: "#0097ff",
-            items: []
+            cards: []
           })
         : "";
     },
@@ -176,7 +179,7 @@ export default {
       this.selectedColumn = this.columns[0];
     },
     deleteCard(index, key) {
-      this.columns[index].items.splice(key, 1);
+      this.columns[index].cards.splice(key, 1);
     },
     selectColumn(column, index) {
       this.selectedColumn = column;
@@ -205,7 +208,7 @@ export default {
     },
     closeModal() {
       if (this.description.length) {
-        this.columns[this.index].items.push({
+        this.columns[this.index].cards.push({
           id: 1,
           data: this.description
         });

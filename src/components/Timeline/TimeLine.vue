@@ -8,9 +8,9 @@
       :dots="false"
       :responsive="{0:{items:1,nav:false},600:{items:4}}"
     >
-      <template slot="prev">
+       <!-- <template slot="prev">
         <span class="material-icons navs-carosel prev">keyboard_arrow_left</span>
-      </template>
+      </template> -->
       <div class="step">
         <img class="steps-img" src="../../assets/pin.png" alt />
         <h3 class="steps-name">Retro 10/01/2019</h3>
@@ -33,9 +33,9 @@
         <h3 class="steps-name">Retro 10/01/2019</h3>
         <p class="steps-description"></p>
       </div>
-      <template slot="next">
+     <!--  <template slot="next">
         <span class="material-icons navs-carosel next">keyboard_arrow_right</span>
-      </template>
+      </template> -->
     </carousel>
     <!-- /.steps-timeline -->
   </section>

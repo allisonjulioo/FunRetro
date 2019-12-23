@@ -1,44 +1,33 @@
 <template>
-  <sy-nav>
+  <sy-nav v-if="this.$route.path !== '/login'">
     <router-link to="/minhas_retros" class="brand">
       <img src="../../assets/brand_light.svg" alt height="36" />
       <sy-title light>Retrospectiva organizador</sy-title>
     </router-link>
     <section class="right-nav">
-      <router-link v-if="logged" to="/minhas_retros">
-        <sy-button primary>{{ $t('MINHAS_RETROS') }}</sy-button>
+      <router-link v-if="logged" to="/retro/1" >
+        <sy-button outline>{{ $t('MINHAS_RETROS') }}</sy-button>
       </router-link>
-      <router-link v-if="logged" to="/retro/1">
-        <sy-button outline>+ {{ $t('CRIAR_RETRO') }}</sy-button>
+      <router-link v-if="logged" to="/minhas_retros">
+        <sy-button primary>+ {{ $t('CRIAR_BOARDS') }}</sy-button>
       </router-link>
       <dropdown :toggle-dropdown="isDropdownVisible">
         <template v-slot:button>
           <sy-button v-if="logged" class="dropdown-toggle" avatar @click="showDropdown">
-            AJ
+            {{userInitials}}
             <span class="arrow">&#9660;</span>
           </sy-button>
           <sy-button v-if="!logged" outline class="dropdown-toggle" @click="showDropdown">Login</sy-button>
+          <sy-button v-if="!logged" class="dropdown-toggle" @click="showDropdown">Cadastrar</sy-button>
         </template>
         <template v-slot:template>
           <section v-if="logged">
             <sy-title normal black>
               <i class="material-icons">account_circle</i>
-              <small>Allison Julio</small>
+              <small>{{userName}}</small>
             </sy-title>
             <hr />
-            <sy-button raised @click="logged = !logged">Sair</sy-button>
-          </section>
-          <section v-if="!logged">
-            <sy-title normal black>Faça o login</sy-title>
-            <sy-input>
-              <label>E-mail</label>
-              <input type="text" />
-            </sy-input>
-            <sy-input>
-              <label>Senha</label>
-              <input type="password" />
-            </sy-input>
-            <sy-button @click="logged = !logged">Entrar</sy-button>
+              <sy-button raised @click="logout()">Sair</sy-button>
           </section>
         </template>
       </dropdown>
@@ -53,10 +42,12 @@
         <section v-if="logged">
           <h4 normal black class="title">
             <span>
-              <sy-button avatar style="min-width: 40px;">AJ</sy-button>
-              <small>Allison Julio</small>
+              <sy-button avatar style="min-width: 40px;">{{userInitials}}</sy-button>
+              <small>{{userName}}</small>
             </span>
-            <sy-button raised @click="logged = !logged">Sair</sy-button>
+            <router-link v-if="logged" to="/login">
+              <sy-button raised @click="logout()">Sair</sy-button>
+            </router-link>
           </h4>
           <hr />
           <ul>
@@ -77,18 +68,6 @@
             </li>
           </ul>
         </section>
-        <section v-if="!logged" class="login">
-          <sy-title normal black>Faça o login</sy-title>
-          <sy-input>
-            <label>E-mail</label>
-            <input type="text" />
-          </sy-input>
-          <sy-input>
-            <label>Senha</label>
-            <input type="password" />
-          </sy-input>
-          <sy-button @click="logged = !logged">Entrar</sy-button>
-        </section>
       </div>
     </div>
   </sy-nav>
@@ -96,6 +75,7 @@
 <script>
 import { SyButton, SyNav, SyTitle, SyInput } from "@/ui-components";
 import Dropdown from "@/components/Dropdown/Dropdown";
+import auth from '@/services/auth'
 
 export default {
   name: "NavHeader",
@@ -110,17 +90,36 @@ export default {
     return {
       openMenu: false,
       isDropdownVisible: false,
-      logged: true
+      logged: true,
+      userName: '',
+      userInitials: ''
     };
   },
   mounted() {
     let vm = this;
+    const user = localStorage.getItem('uitoken');
+    if(user) this.logged = true
+    else {
+      this.logged = false
+      this.$router.replace({ path: `/login` })
+    }
+
+    auth.getUser().then(res => {
+      vm.userName = res.data.data.name.charAt(0).toUpperCase() + res.data.data.name.substr(1);
+      let split = res.data.data.name.split(" ");
+      vm.userInitials = split[0].charAt(0).toUpperCase();
+    })
     this.$root.$on("closeDropdown", e => (vm.isDropdownVisible = false));
   },
   methods: {
     showDropdown(e) {
       this.isDropdownVisible = !this.isDropdownVisible;
       e.stopPropagation();
+    },
+    logout(){
+      localStorage.clear();
+      this.$router.replace({ path: `/login` })
+      this.openMenu = false;
     }
   }
 };
@@ -147,7 +146,7 @@ export default {
 @media (max-width: 981px) {
   nav {
     height: 50px;
-    z-index: +1;
+    z-index: 9;
     position: fixed;
     top: 0;
     left: 0;
@@ -176,13 +175,6 @@ export default {
     i {
       font-size: 32px !important;
       color: #fff;
-    }
-    .login {
-      padding: 25px;
-      button {
-        min-width: 100%;
-        margin: 10px 0;
-      }
     }
   }
   .backdrop {
