@@ -1,4 +1,4 @@
-# sympla-retro
+# Bar do Moe
 
 ## Project setup
 ```
