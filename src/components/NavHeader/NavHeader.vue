@@ -17,8 +17,6 @@
             {{userInitials}}
             <span class="arrow">&#9660;</span>
           </sy-button>
-          <sy-button v-if="!logged" outline class="dropdown-toggle" @click="showDropdown">Login</sy-button>
-          <sy-button v-if="!logged" class="dropdown-toggle" @click="showDropdown">Cadastrar</sy-button>
         </template>
         <template v-slot:template>
           <section v-if="logged">
