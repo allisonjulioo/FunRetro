@@ -20,7 +20,7 @@
             hover
             class="boards"
             v-for="(board, index) in boards"
-            :key="board.board_id"
+            :key="index"
             :class="{'in_voting' : board.in_voting}"
           >
             <router-link v-if="!board.in_voting" class="action-link" :to="'/board/'+ board.board_id" :col="3">
