@@ -1,7 +1,7 @@
 <template>
   <div id="login">
     <img src="../assets/brand_light.svg" alt width="150" />
-    <section id="form" v-if="!register">
+    <section id="form" v-if="!register" class="animated fadeIn">
       <sy-title style="color: white; text-align: center">Login</sy-title>
       <form @submit="login()">
         <sy-input style="margin-bottom: 20px;">
@@ -32,24 +32,24 @@
         <sy-button @click="login()">Entrar</sy-button>
       </div>
     </section>
-    <section id="form" v-if="register">
+    <section id="form" v-if="register" class="animated fadeIn">
       <sy-title style="color: white; text-align: center">Cadastrar</sy-title>
       <div>
         <sy-input>
           <label>Nome</label>
-          <input type="text" class="animated fast wobble" v-model="user.name" />
+          <input type="text" v-model="user.name" />
         </sy-input>
         <sy-input>
           <label>E-mail</label>
-          <input type="text" class="animated fast wobble delay-1s" v-model="user.email" />
+          <input type="text" v-model="user.email" />
         </sy-input>
         <sy-input>
           <label>Senha</label>
-          <input type="password" class="animated fast wobble delay-2s" v-model="user.firstPassword" />
+          <input type="password" v-model="user.firstPassword" />
         </sy-input>
         <sy-input>
           <label>Repita a senha</label>
-          <input type="password" class="animated fast wobble delay-3s" v-model="user.password" />
+          <input type="password" v-model="user.password" />
         </sy-input>
       </div>
       <div class="action-btns">
