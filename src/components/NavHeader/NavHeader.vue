@@ -1,16 +1,16 @@
 <template>
   <sy-nav v-if="this.$route.path !== '/login'">
-    <router-link to="/minhas_retros" class="brand">
+    <router-link to="/boards" class="brand">
       <img src="../../assets/brand_light.svg" alt height="36" />
       <sy-title light>Retrospectiva organizador</sy-title>
     </router-link>
     <section class="right-nav">
-      <router-link v-if="logged" to="/retro/1" >
+     <!-- <router-link v-if="logged" to="/retro/1" >
         <sy-button outline>{{ $t('MINHAS_RETROS') }}</sy-button>
       </router-link>
-      <router-link v-if="logged" to="/minhas_retros">
+      <router-link v-if="logged" to="/boards">
         <sy-button primary>+ {{ $t('CRIAR_BOARDS') }}</sy-button>
-      </router-link>
+      </router-link> -->
       <dropdown :toggle-dropdown="isDropdownVisible">
         <template v-slot:button>
           <sy-button v-if="logged" class="dropdown-toggle" avatar @click="showDropdown">
@@ -55,15 +55,15 @@
             <li>
               <router-link
                 @click.native="openMenu = !openMenu"
-                to="/minhas_retros"
-              >{{ $t('MINHAS_RETROS') }}</router-link>
+                to="/boards"
+              >{{ $t('MEUS_BOARDS') }}</router-link>
             </li>
-            <li>
+           <!-- <li>
               <router-link
                 @click.native="openMenu = !openMenu"
                 to="/retro/1"
               >+ {{ $t('CRIAR_RETRO') }}</router-link>
-            </li>
+            </li> -->
           </ul>
         </section>
       </div>

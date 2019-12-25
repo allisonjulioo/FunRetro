@@ -64,22 +64,22 @@
             <sy-card class="draggable-item" v-bind:style="{ backgroundColor : column.color }">
               <inline-edit
                 :label="card.content"
-                @lchanged="$event =>{ card.content = $event}"
+                @lchanged="$event =>{ card.content = $event, updateCard(card)}"
                 :color="'#fff'"
               />
               <sy-button icon v-bind:style="{ backgroundColor : column.color + '!important' }">
-                <i class="material-icons" @click="deleteCard(index, key)">delete</i>
+                <i class="material-icons" @click="deleteCard(card.card_id)">delete</i>
               </sy-button>
             </sy-card>
           </Draggable>
         </Container>
       </Draggable>
     </Container>
-    <modal v-if="isModalVisible" @close="closeModal" @cancel="isModalVisible = false">
+    <modal v-if="isModalVisible" @close="createCard(selectedCard)" @cancel="isModalVisible = false">
       <template v-slot:header>
         <label>
           Criar para
-          <strong>{{selectedCard}}</strong>
+          <strong>{{selectedCard.title}}</strong>
         </label>
       </template>
       <template v-slot:body>
@@ -179,10 +179,16 @@ export default {
     this.getInfoBoard();
   },
   methods: {
+    getInfoBoard() {
+      const id = this.$route.params.idBoard;
+      boardService.getBoardById(id).then(res => {
+        this.board = res.data.board;
+      });
+    },
     addColumn() {
       const data = {
         title: "Nova coluna (Edite o titulo)",
-        color: '#0097ff',
+        color: "#0097ff",
         board_id: this.board.board_id
       };
       if (this.columns.length <= 4) {
@@ -219,14 +225,32 @@ export default {
         this.getColumns();
       });
     },
-    getInfoBoard() {
-      const id = this.$route.params.idBoard;
-      boardService.getBoardById(id).then(res => {
-        this.board = res.data.board;
+    createCard(column) {
+      if (this.description.length) {
+        const data = {
+          content: this.description,
+          board_id: column.board_id,
+          column_id: column.column_id
+        };
+        cardService.createCard(data).then(res => {
+          toast.open("Card criado", "success");
+          this.getColumns();
+          this.description = "";
+          this.isModalVisible = false;
+        });
+      }
+    },
+    updateCard(card) {
+      cardService.updateCard(card).then(res => {
+        toast.open("Card atualizado", "success");
+        this.getColumns();
       });
     },
-    deleteCard(index, key) {
-      this.columns[index].cards.splice(key, 1);
+    deleteCard(card_id) {
+      cardService.deleteCard(card_id).then(res => {
+        toast.open("Card deletado", "");
+        this.getColumns();
+      });
     },
     selectColumn(column, index) {
       this.selectedColumn = column;
@@ -251,17 +275,7 @@ export default {
     showModal(column) {
       const newItems = [...this.columns];
       this.index = newItems.indexOf(column);
-      (this.selectedCard = column.title), (this.isModalVisible = true);
-    },
-    closeModal() {
-      if (this.description.length) {
-        this.columns[this.index].cards.push({
-          id: 1,
-          content: this.description
-        });
-        this.description = "";
-      }
-      this.isModalVisible = false;
+      (this.selectedCard = column), (this.isModalVisible = true);
     }
   }
 };

@@ -102,7 +102,7 @@ export default {
         if (res.data.auth) {
           localStorage.setItem("uid", res.data.id_user);
           localStorage.setItem("uitoken", res.data.token);
-          window.location.href = "/minhas_retros";
+          window.location.href = "/boards";
           toast.open("Seja bem vindo!", "success");
         } else {
           this.error = true;

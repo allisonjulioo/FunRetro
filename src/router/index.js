@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import MinhasRetros from '../views/MinhasRetros.vue'
-import CreateBoard from '../views/CreateRetro.vue'
+import Boards from '../views/Boards.vue'
+import CreateBoard from '../views/CreateBoard.vue'
 import LoginComponent from '../views/Login.vue'
 import Axios from 'axios'
 
@@ -21,9 +21,9 @@ const authGuard = (to, from, next) => {
 
 const routes = [
   {
-    path: '/minhas_retros',
-    name: 'minhas_retros',
-    component: MinhasRetros,
+    path: '/boards',
+    name: 'boards',
+    component: Boards,
      beforeEnter: authGuard
   },
   {
@@ -39,7 +39,7 @@ const routes = [
   },
   {
     path: '**',
-    component: LoginComponent
+    component: Boards
   }
 ]
 
