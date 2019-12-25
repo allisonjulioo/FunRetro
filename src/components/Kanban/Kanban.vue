@@ -1,7 +1,11 @@
 <template>
   <div id="board">
     <div class="header">
-      <sy-title primary>Novo board</sy-title>
+      <sy-title primary>
+        {{board.title}}
+        <br />
+        <sy-title sub style="margin: 0">Criado em: {{board.created_date | formatDate}}</sy-title>
+      </sy-title>
       <sy-button
         @click="addColumn('AddNew')"
         :disabled="columns.length >= 4"
@@ -43,16 +47,17 @@
           <i class="material-icons">add</i>
         </button>
         <Container
+          :drag-begin-delay="500"
           group-name="1"
           :get-child-payload="getChildPayload"
           @drop="onInnerDrop(column, $event)"
           :drop-placeholder="dropPlaceholderOptions"
         >
-          <Draggable v-for="(item, key) in column.cards" :key="key">
+          <Draggable v-for="(card, key) in column.cards" :key="key">
             <sy-card class="draggable-item" v-bind:style="{ backgroundColor : column.color }">
               <inline-edit
-                :label="item.data"
-                @lchanged="$event => item.data = $event"
+                :label="card.content"
+                @lchanged="$event =>{ card.content = $event}"
                 :color="'#fff'"
               />
               <sy-button icon v-bind:style="{ backgroundColor : column.color + '!important' }">
@@ -114,6 +119,8 @@ import {
 import Modal from "@/components/Modal/Modal.vue";
 import InlineEdit from "@/components/InlineEdit/InlineEdit.vue";
 import columnService from "@/services/column";
+import boardService from "@/services/boards";
+import cardService from "@/services/cards";
 
 export default {
   name: "Kanban",
@@ -141,7 +148,13 @@ export default {
         showOnTop: true
       },
       menuBarMobile: false,
-      selectedColumn: Object
+      selectedColumn: Object,
+      board: {
+        title: String,
+        created_date: Date,
+        limit_votes: Boolean,
+        in_voting: Boolean
+      }
     };
   },
   created() {
@@ -155,12 +168,27 @@ export default {
     };
     this.$root.$on("changedElement", event => console.log(event));
     this.getColumns();
+    this.getInfoBoard();
   },
   methods: {
     getColumns() {
       const id = this.$route.params.idBoard;
       columnService.getColumns(id).then(res => {
-        this.columns = res.data.columns;
+        let data = res.data.columns.length ? res.data.columns : [];
+        data.forEach(column => {
+          this.columns = res.data.columns;
+          cardService
+            .getCardsByIdColumn(column.board_id, column.column_id)
+            .then(res => {
+              column.cards = res.data.cards;
+            });
+        });
+      });
+    },
+    getInfoBoard() {
+      const id = this.$route.params.idBoard;
+      boardService.getBoardById(id).then(res => {
+        this.board = res.data.board;
       });
     },
     addColumn() {
@@ -168,7 +196,7 @@ export default {
         ? this.columns.push({
             id: 1,
             className: "default",
-            title: "Nome",
+            title: "(clique para editar)",
             color: "#0097ff",
             cards: []
           })
@@ -210,7 +238,7 @@ export default {
       if (this.description.length) {
         this.columns[this.index].cards.push({
           id: 1,
-          data: this.description
+          content: this.description
         });
         this.description = "";
       }

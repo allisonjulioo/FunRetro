@@ -3,7 +3,7 @@ import axios from 'axios'
 const user_id = localStorage.getItem('uid')
 const endpoint = `${config.apiUrl}/api/columns`
 export default {
-  getColumns: (column_id) => {
+  getColumns: column_id => {
     return axios({
       method: 'get',
       url: `${endpoint}/${user_id}/${column_id}`
@@ -43,5 +43,5 @@ export default {
     })
       .then(response => response)
       .catch(error => error)
-  }
+  },
 }

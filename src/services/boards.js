@@ -11,6 +11,14 @@ export default {
       .then(response => response)
       .catch(error => error)
   },
+  getBoardById: board_id => {
+    return axios({
+      method: 'get',
+      url: `${enpoint}/${user_id}/${board_id}`
+    })
+      .then(response => response)
+      .catch(error => error)
+  },
   createBoard: data => {
     const params = new URLSearchParams()
     params.append('title', data.title)
