@@ -338,6 +338,12 @@ export default {
     flex: 1 1 33.33%;
     padding: 10px 20px;
     border-radius: 4px;
+    @media(max-width: 981px){
+      display: table;
+      padding-bottom: 100px;
+      margin-bottom: 100px;
+      overflow: auto;
+     }
     .draggable-item {
       color: #fff;
       position: relative;
