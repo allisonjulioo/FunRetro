@@ -173,8 +173,8 @@ export default {
     window.onresize = function(e) {
       let size = window.innerWidth;
       vm.menuBarMobile = size <= 981;
+      this.selectedColumn = this.columns[0];
     };
-    this.$root.$on("changedElement", event => console.log(event));
     this.getColumns();
     this.getInfoBoard();
   },
@@ -187,7 +187,7 @@ export default {
     },
     addColumn() {
       const data = {
-        title: "Nova coluna (Edite o titulo)",
+        title: "Nova coluna",
         color: "#0097ff",
         board_id: this.board.board_id
       };
@@ -205,6 +205,7 @@ export default {
         if (res.data.columns.length)
           data.forEach(column => {
             this.columns = res.data.columns;
+            this.selectedColumn = this.columns[0];
             cardService
               .getCardsByIdColumn(column.board_id, column.column_id)
               .then(res => {
@@ -433,6 +434,7 @@ export default {
       right: 20px;
       color: #fff;
       z-index: +1;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
     }
   }
 }
