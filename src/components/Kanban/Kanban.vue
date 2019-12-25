@@ -4,7 +4,10 @@
       <sy-title primary>
         {{board.title}}
         <br />
-        <sy-title sub style="margin: 0; font-size: 12px;">Criado em: {{board.created_date | formatDate}}</sy-title>
+        <sy-title
+          sub
+          style="margin: 0; font-size: 12px;"
+        >Criado em: {{board.created_date | formatDate}}</sy-title>
       </sy-title>
       <sy-button
         @click="addColumn('AddNew')"
@@ -31,12 +34,16 @@
         <div class="title column-drag-handle">
           <sy-title normal class="header-column">
             <label id="color" v-bind:style="{ backgroundColor : column.color }">
-              <input v-model="column.color" type="color" name />
+              <input v-model="column.color" type="color" name @change="updateColumn(column)" />
             </label>
-            <inline-edit :label="column.title" @lchanged="$event => column.title = $event" input />
+            <inline-edit
+              :label="column.title"
+              @lchanged="$event => {column.title = $event; updateColumn(column)}"
+              input
+            />
           </sy-title>
           <sy-button icon>
-            <i class="material-icons" @click="deleteColumn(index)">delete</i>
+            <i class="material-icons" @click="deleteColumn(column)">delete</i>
           </sy-button>
         </div>
         <button
@@ -121,6 +128,7 @@ import InlineEdit from "@/components/InlineEdit/InlineEdit.vue";
 import columnService from "@/services/column";
 import boardService from "@/services/boards";
 import cardService from "@/services/cards";
+import toast from "@/services/toaster";
 
 export default {
   name: "Kanban",
@@ -171,12 +179,23 @@ export default {
     this.getInfoBoard();
   },
   methods: {
+    addColumn() {
+      const data = {
+        title: "Nova coluna (Edite o titulo)",
+        color: '#0097ff',
+        board_id: this.board.board_id
+      };
+      if (this.columns.length <= 4) {
+        columnService.createColumn(data).then(res => {
+          toast.open("Coluna criada", "success");
+          this.getColumns();
+        });
+      }
+    },
     getColumns() {
       const id = this.$route.params.idBoard;
       columnService.getColumns(id).then(res => {
-        let data = res.data.columns.length
-          ? res.data.columns
-          : this.createFirstColumns();
+        let data = res.data.columns.length ? res.data.columns : [];
         if (res.data.columns.length)
           data.forEach(column => {
             this.columns = res.data.columns;
@@ -188,29 +207,23 @@ export default {
           });
       });
     },
-    createFirstColumns() {
-      console.log("Deus")
+    updateColumn(column) {
+      columnService.updateColumn(column).then(res => {
+        toast.open(res.data.message, "success");
+        this.getColumns();
+      });
+    },
+    deleteColumn(column) {
+      columnService.deleteColumn(column.column_id).then(res => {
+        toast.open(`Coluna ${column.title} deletada`, "");
+        this.getColumns();
+      });
     },
     getInfoBoard() {
       const id = this.$route.params.idBoard;
       boardService.getBoardById(id).then(res => {
         this.board = res.data.board;
       });
-    },
-    addColumn() {
-      this.columns.length <= 4
-        ? this.columns.push({
-            id: 1,
-            className: "default",
-            title: "(clique para editar)",
-            color: "#0097ff",
-            cards: []
-          })
-        : "";
-    },
-    deleteColumn(index) {
-      this.columns.splice(index, 1);
-      this.selectedColumn = this.columns[0];
     },
     deleteCard(index, key) {
       this.columns[index].cards.splice(key, 1);

@@ -3,13 +3,15 @@
     <img src="../assets/brand_light.svg" alt width="150" />
     <section id="form" v-if="!register">
       <sy-title style="color: white; text-align: center">Login</sy-title>
-      <div>
+      <form @submit="login()">
         <sy-input style="margin-bottom: 20px;">
           <label>E-mail</label>
           <input
             type="email"
             class="animated fast"
             v-model="user.email"
+            autofocus="on"
+            autocomplete="on"
             :class="{'hasError shake' : error}"
           />
           <span class="alert" v-if="error">E-mail inválido</span>
@@ -24,10 +26,10 @@
           />
           <span class="alert" v-if="error">Senha inválido</span>
         </sy-input>
-      </div>
+      </form>
       <div class="action-btns">
-        <sy-button @click="login()">Entrar</sy-button>
         <sy-button outline @click="register = !register">Cadastrar</sy-button>
+        <sy-button @click="login()">Entrar</sy-button>
       </div>
     </section>
     <section id="form" v-if="register">
@@ -39,20 +41,20 @@
         </sy-input>
         <sy-input>
           <label>E-mail</label>
-          <input type="text" class="animated fast wobble  delay-1s" v-model="user.email" />
+          <input type="text" class="animated fast wobble delay-1s" v-model="user.email" />
         </sy-input>
         <sy-input>
           <label>Senha</label>
-          <input type="password" class="animated fast wobble  delay-2s" v-model="user.firstPassword" />
+          <input type="password" class="animated fast wobble delay-2s" v-model="user.firstPassword" />
         </sy-input>
         <sy-input>
           <label>Repita a senha</label>
-          <input type="password" class="animated fast wobble  delay-3s" v-model="user.password" />
+          <input type="password" class="animated fast wobble delay-3s" v-model="user.password" />
         </sy-input>
       </div>
       <div class="action-btns">
+        <sy-button outline @click="register = !register">Login</sy-button>
         <sy-button @click="signup()">Cadastrar</sy-button>
-        <sy-button outline @click="register = !register">Cancelar</sy-button>
       </div>
     </section>
   </div>
@@ -68,7 +70,7 @@ import {
   SyInput
 } from "@/ui-components";
 import auth from "@/services/auth";
-import toaster from "@/services/toaster";
+import toast from "@/services/toaster";
 
 export default {
   name: "Login",
@@ -101,13 +103,13 @@ export default {
           localStorage.setItem("uid", res.data.id_user);
           localStorage.setItem("uitoken", res.data.token);
           window.location.href = "/minhas_retros";
-          toaster.open("Seja bem vindo!", "success");
+          toast.open("Seja bem vindo!", "success");
         } else {
           this.error = true;
           setTimeout(() => {
             this.error = false;
           }, 2000);
-          toaster.open("Login Invalido", "error");
+          toast.open("Login Invalido", "error");
         }
       });
     },

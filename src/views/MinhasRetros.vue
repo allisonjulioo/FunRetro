@@ -36,10 +36,10 @@
               </sy-title>
               <sy-title black normal sub class="f-2" style="white-space: nowrap">
                 <i class="material-icons mr-2">date_range</i>
-                {{board.created_date | formatDate}} -
+                {{board.created_date | formatDate}}
                 <span
                   class="span-my-retros"
-                >Em votação</span>
+                >{{ board.in_voting ? '-Em votação' : ''}}</span>
               </sy-title>
             </router-link>
             <sy-input v-if="board.in_voting" class="on-edit">

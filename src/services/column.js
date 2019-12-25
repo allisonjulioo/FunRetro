@@ -14,11 +14,10 @@ export default {
   createColumn: data => {
     const params = new URLSearchParams()
     params.append('title', data.title)
-    params.append('limit_votes', data.limit_votes)
-    params.append('user_id', user_id)
+    params.append('color', data.color)
     return axios({
       method: 'post',
-      url: `${endpoint}/`,
+      url: `${endpoint}/${user_id}/${data.board_id}`,
       data: params
     })
       .then(response => response)
@@ -27,19 +26,19 @@ export default {
   updateColumn: data => {
     const params = new URLSearchParams()
     params.append('title', data.title)
-    params.append('limit_votes', data.limit_votes)
+    params.append('color', data.color)
     return axios({
       method: 'patch',
-      url: `${endpoint}/${user_id}/${data.board_id}`,
+      url: `${endpoint}/${data.column_id}`,
       data: params
     })
       .then(response => response)
       .catch(error => error)
   },
-  deleteColumn: board_id => {
+  deleteColumn: column_id => {
     return axios({
       method: 'delete',
-      url: `${endpoint}/${user_id}/${board_id}`
+      url: `${endpoint}/${column_id}`
     })
       .then(response => response)
       .catch(error => error)
