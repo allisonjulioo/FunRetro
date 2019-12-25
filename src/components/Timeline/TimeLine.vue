@@ -48,10 +48,11 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import "../../../variables/_colors.scss";
 $outline-width: 0;
 $break-point: 981px;
 $gray-base: #999999;
-$brand-primary: #0097ff; //Zen Blue
+$brand-primary: $primary; //Zen Blue
 
 #Steps {
   background: #fff;
@@ -119,7 +120,7 @@ $brand-primary: #0097ff; //Zen Blue
   &:hover {
     transition: all 0.5s ease;
     margin-top: -10px;
-    background: #0097ff;
+    background:  $primary;
     box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 8px 0px,
       rgba(0, 0, 0, 0.1) 0px 20px 20px -7px;
     cursor: pointer;

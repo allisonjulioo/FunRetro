@@ -4,7 +4,7 @@
       <sy-title primary>
         {{board.title}}
         <br />
-        <sy-title sub style="margin: 0">Criado em: {{board.created_date | formatDate}}</sy-title>
+        <sy-title sub style="margin: 0; font-size: 12px;">Criado em: {{board.created_date | formatDate}}</sy-title>
       </sy-title>
       <sy-button
         @click="addColumn('AddNew')"

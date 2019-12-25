@@ -23,7 +23,12 @@
             :key="index"
             :class="{'in_voting' : board.in_voting}"
           >
-            <router-link v-if="!board.in_voting" class="action-link" :to="'/board/'+ board.board_id" :col="3">
+            <router-link
+              v-if="!board.in_voting"
+              class="action-link"
+              :to="'/board/'+ board.board_id"
+              :col="3"
+            >
               <sy-title black normal>{{board.title}}</sy-title>
               <sy-title black normal sub>
                 Votos por usuário
@@ -33,7 +38,7 @@
                 <i class="material-icons mr-2">date_range</i>
                 {{board.created_date | formatDate}} -
                 <span
-                  style="color: #0097ff; font-size: 18px;"
+                  class="span-my-retros"
                 >Em votação</span>
               </sy-title>
             </router-link>
@@ -94,7 +99,7 @@
 <script>
 import TimeLine from "@/components/Timeline/TimeLine";
 import Modal from "@/components/Modal/Modal";
-import boardService from '@/services/boards'
+import boardService from "@/services/boards";
 
 import {
   SyCard,
@@ -131,20 +136,20 @@ export default {
       editMode: false
     };
   },
-  computed:{
-    load: async function(){
-      await this.getBoards()
-    },
+  computed: {
+    load: async function() {
+      await this.getBoards();
+    }
   },
-  mounted(){
-    this.load
+  mounted() {
+    this.load;
   },
   methods: {
     getBoards() {
       let vm = this;
-      boardService.getBoards().then(res =>{
+      boardService.getBoards().then(res => {
         vm.boards = res.data.boards;
-      })
+      });
     },
     showModal() {
       this.isModalVisible = true;
@@ -153,29 +158,29 @@ export default {
       let vm = this;
       const data = {
         title: this.board.title,
-        limit_votes: this.board.limit_votes,
-      }
+        limit_votes: this.board.limit_votes
+      };
       boardService.createBoard(data).then(res => {
         this.getBoards();
         vm.isModalVisible = false;
-      })
-
+      });
     },
     deleteBoard(id) {
       boardService.deleteBoard(id).then(res => {
         this.getBoards();
-      })
+      });
     },
     editBoard(board) {
       boardService.updateBoard(board).then(res => {
         this.getBoards();
-      })
+      });
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+@import "../../variables/_colors.scss";
 .container-board {
   margin-top: 40px;
   @media (max-width: 981px) {
@@ -184,22 +189,26 @@ export default {
     }
   }
 }
+.span-my-retros {
+  color: $primary;
+  font-size: 18px;
+}
 .boards {
   width: calc(25% - 30px);
   margin-right: 20px;
   max-width: 300px;
   position: relative;
   overflow: hidden;
-  @media (max-width: 981px){
+  @media (max-width: 981px) {
     width: 100%;
     margin-right: 0px;
     max-width: 100%;
-    .actions{
+    .actions {
       opacity: 1 !important;
     }
   }
 
-  a > h1{
+  a > h1 {
     text-overflow: ellipsis;
     overflow: hidden;
   }
@@ -218,7 +227,7 @@ export default {
     opacity: 0.3;
     transition: all 0.3s ease;
     width: 100%;
-    background: #0097ff;
+    background: $primary;
     padding: 5px 15px;
     position: absolute;
     right: 0%;
@@ -238,7 +247,7 @@ export default {
     box-shadow: 0 4px 24px 1px rgba(128, 48, 255, 0.2);
     .actions {
       opacity: 1 !important;
-        background: #8030ff;
+      background: #8030ff;
     }
   }
   &:hover {
@@ -261,7 +270,7 @@ export default {
   .empty-boards {
     width: 100%;
   }
-  .container-board{
+  .container-board {
     margin: 0;
   }
   .title {
@@ -274,7 +283,7 @@ export default {
       right: 10px;
       z-index: 1;
       font-size: 12px;
-          height: 50px;
+      height: 50px;
     }
   }
 }

@@ -100,7 +100,7 @@ export const SyInput = styled('label', inputProps)`
         height: 40px;
         border-radius: 3px;
         &.hasError{
-          border: solid 1px ${bgColor.strawberry};
+          border: solid 1px ${bgColor.strawberry} !important;
           *{
             border: solid 1px ${bgColor.strawberry} !important;
           }

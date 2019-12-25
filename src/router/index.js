@@ -9,16 +9,28 @@ Vue.prototype.$http = Axios
 const accessToken = localStorage.getItem('access_token')
 Vue.use(Router)
 
+const authGuard = (to, from, next) => {
+  const loggedIn = localStorage.getItem('uitoken')
+
+  if (!loggedIn) {
+    return next('/login')
+  }
+
+  next()
+}
+
 const routes = [
   {
     path: '/minhas_retros',
     name: 'minhas_retros',
-    component: MinhasRetros
+    component: MinhasRetros,
+     beforeEnter: authGuard
   },
   {
     path: '/board/:idBoard',
     name: 'board/:idBoard',
-    component: CreateBoard
+    component: CreateBoard,
+    beforeEnter: authGuard
   },
   {
     path: '/login',
@@ -37,19 +49,6 @@ const router = new Router({
   apiUrl: 'http://localhost:8000',
   linkExactActiveClass: 'is-active',
   routes
-})
-
-router.beforeEach((to, from, next) => {
-  // redirect to login page if not logged in and trying to access a restricted page
-  const publicPages = ['/login']
-  const authRequired = !publicPages.includes(to.path)
-  const loggedIn = localStorage.getItem('uitoken')
-
-  if (authRequired && !loggedIn) {
-    return next('/login')
-  }
-
-  next()
 })
 
 export default router

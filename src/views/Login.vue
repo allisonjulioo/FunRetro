@@ -4,13 +4,25 @@
     <section id="form" v-if="!register">
       <sy-title style="color: white; text-align: center">Login</sy-title>
       <div>
-        <sy-input>
+        <sy-input style="margin-bottom: 20px;">
           <label>E-mail</label>
-          <input type="email" v-model="user.email" />
+          <input
+            type="email"
+            class="animated fast"
+            v-model="user.email"
+            :class="{'hasError shake' : error}"
+          />
+          <span class="alert" v-if="error">E-mail inválido</span>
         </sy-input>
         <sy-input>
           <label>Password</label>
-          <input type="password" v-model="user.password" />
+          <input
+            type="password"
+            class="animated fast"
+            v-model="user.password"
+            :class="{'hasError shake' : error}"
+          />
+          <span class="alert" v-if="error">Senha inválido</span>
         </sy-input>
       </div>
       <div class="action-btns">
@@ -23,19 +35,19 @@
       <div>
         <sy-input>
           <label>Nome</label>
-          <input type="text" v-model="user.name" />
+          <input type="text" class="animated fast wobble" v-model="user.name" />
         </sy-input>
         <sy-input>
           <label>E-mail</label>
-          <input type="text" v-model="user.email" />
+          <input type="text" class="animated fast wobble  delay-1s" v-model="user.email" />
         </sy-input>
         <sy-input>
           <label>Senha</label>
-          <input type="password" v-model="user.firstPassword" />
+          <input type="password" class="animated fast wobble  delay-2s" v-model="user.firstPassword" />
         </sy-input>
         <sy-input>
           <label>Repita a senha</label>
-          <input type="password" v-model="user.password" />
+          <input type="password" class="animated fast wobble  delay-3s" v-model="user.password" />
         </sy-input>
       </div>
       <div class="action-btns">
@@ -55,7 +67,8 @@ import {
   SyContainer,
   SyInput
 } from "@/ui-components";
-import auth from '@/services/auth'
+import auth from "@/services/auth";
+import toaster from "@/services/toaster";
 
 export default {
   name: "Login",
@@ -70,6 +83,7 @@ export default {
   },
   data() {
     return {
+      error: false,
       user: {
         name: "",
         email: "",
@@ -80,42 +94,49 @@ export default {
     };
   },
   methods: {
-  login() {
-    let vm  = this;
-      auth.login(this.user.email, this.user.password)
-    .then(res => {
-      if(res.data.auth){
-        localStorage.setItem('uid', res.data.id_user)
-        localStorage.setItem('uitoken', res.data.token)
-         window.location.href="/minhas_retros";
-      }
-    })
-  },
-  signup(){
-    const user = {
-      name: this.user.name,
-      email:this.user.email ,
-      password: this.user.password
+    login() {
+      let vm = this;
+      auth.login(this.user.email, this.user.password).then(res => {
+        if (res.data.auth) {
+          localStorage.setItem("uid", res.data.id_user);
+          localStorage.setItem("uitoken", res.data.token);
+          window.location.href = "/minhas_retros";
+          toaster.open("Seja bem vindo!", "success");
+        } else {
+          this.error = true;
+          setTimeout(() => {
+            this.error = false;
+          }, 2000);
+          toaster.open("Login Invalido", "error");
+        }
+      });
+    },
+    signup() {
+      const user = {
+        name: this.user.name,
+        email: this.user.email,
+        password: this.user.password
+      };
+      auth.signup(user).then(res => {
+        if (res.data.isValid) {
+          this.login();
+        }
+      });
     }
-    auth.signup(user)
-    .then(res => {
-      if(res.data.isValid){
-        this.login()
-      }
-    })
-   }
   }
-}
+};
 </script>
 <style lang="scss" scoped>
+@import "../../variables/_colors.scss";
 #login {
   /*background-image: linear-gradient(to bottom right, #494ecd, #3a92f2);*/
-  background: #0097ff;
+  background: $primary;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  margin-bottom: -60px;
   img {
     margin-bottom: 40px;
     margin-top: -10%;

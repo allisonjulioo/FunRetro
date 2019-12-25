@@ -101,11 +101,12 @@ export default {
       this.logged = false
       this.$router.replace({ path: `/login` })
     }
-
     auth.getUser().then(res => {
-      vm.userName = res.data.data.name.charAt(0).toUpperCase() + res.data.data.name.substr(1);
-      let split = res.data.data.name.split(" ");
-      vm.userInitials = split[0].charAt(0).toUpperCase();
+      if(!res.data.error){
+        res ? vm.userName = res.data.data.name.charAt(0).toUpperCase() + res.data.data.name.substr(1) : '';
+        let split = res.data.data.name.split(" ");
+        vm.userInitials = split[0].charAt(0).toUpperCase();
+      }
     })
     this.$root.$on("closeDropdown", e => (vm.isDropdownVisible = false));
   },
