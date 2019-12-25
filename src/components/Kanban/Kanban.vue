@@ -174,16 +174,22 @@ export default {
     getColumns() {
       const id = this.$route.params.idBoard;
       columnService.getColumns(id).then(res => {
-        let data = res.data.columns.length ? res.data.columns : [];
-        data.forEach(column => {
-          this.columns = res.data.columns;
-          cardService
-            .getCardsByIdColumn(column.board_id, column.column_id)
-            .then(res => {
-              column.cards = res.data.cards;
-            });
-        });
+        let data = res.data.columns.length
+          ? res.data.columns
+          : this.createFirstColumns();
+        if (res.data.columns.length)
+          data.forEach(column => {
+            this.columns = res.data.columns;
+            cardService
+              .getCardsByIdColumn(column.board_id, column.column_id)
+              .then(res => {
+                column.cards = res.data.cards;
+              });
+          });
       });
+    },
+    createFirstColumns() {
+      console.log("Deus")
     },
     getInfoBoard() {
       const id = this.$route.params.idBoard;
@@ -382,7 +388,7 @@ export default {
               margin: 0 auto 5px;
             }
             span {
-              font-size: 12px;
+              font-size: 10px;
             }
             &.active {
               background: #eee;
