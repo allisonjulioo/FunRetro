@@ -100,7 +100,6 @@
 import TimeLine from "@/components/Timeline/TimeLine";
 import Modal from "@/components/Modal/Modal";
 import boardService from "@/services/boards";
-
 import {
   SyCard,
   Row,
@@ -141,8 +140,19 @@ export default {
       await this.getBoards();
     }
   },
+  created() {
+    // Emitting 'leave' event on tab closed event.
+    window.onbeforeunload = () => {
+      this.$socket.emit("leave", this.username);
+    };
+  },
   mounted() {
     this.load;
+  },
+  sockets: {
+    connect: function() {
+      console.log("socket connected");
+    },
   },
   methods: {
     getBoards() {

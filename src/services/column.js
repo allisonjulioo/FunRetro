@@ -17,7 +17,7 @@ export default {
     params.append('color', data.color)
     return axios({
       method: 'post',
-      url: `${endpoint}/${user_id}/${data.board_id}`,
+      url: `${endpoint}/${data.board_id}`,
       data: params
     })
       .then(response => response)

@@ -5,14 +5,26 @@ import i18n from './i18n'
 import axios from 'axios'
 import moment from 'moment'
 import '../variables/animate.scss'
+import VueSocketIO from 'vue-socket.io'
+import conf from './services/config'
 
 Vue.filter('formatDate', function (value) {
   if (value) {
     return moment(String(value)).format('DD/MM/YYYY')
   }
 })
-Vue.config.productionTip = false
 
+Vue.config.productionTip = false
+Vue.use(
+  new VueSocketIO({
+    debug: true,
+    connection: conf.apiUrl,
+    vuex: {
+      actionPrefix: 'SOCKET_',
+      mutationPrefix: 'SOCKET_'
+    }
+  })
+)
 new Vue({
   router,
   i18n,

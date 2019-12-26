@@ -14,7 +14,7 @@ export default {
   getBoardById: board_id => {
     return axios({
       method: 'get',
-      url: `${enpoint}/${user_id}/${board_id}`
+      url: `${config.apiUrl}/api/board/${board_id}`
     })
       .then(response => response)
       .catch(error => error)

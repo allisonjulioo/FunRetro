@@ -2,7 +2,7 @@
   <div id="board">
     <div class="header">
       <sy-title primary>
-        {{board.title}}
+        {{board.title || 'Novo board'}}
         <br />
         <sy-title
           sub
@@ -165,14 +165,18 @@ export default {
       }
     };
   },
+  sockets: {
+    socketUpdateColumn: function(data) {
+      this.getColumns();
+    }
+  },
   created() {
-    let vm = this;
     let size = window.innerWidth;
-    vm.menuBarMobile = size <= 981;
+    this.menuBarMobile = size <= 981;
     this.selectedColumn = this.columns[0];
     window.onresize = function(e) {
       let size = window.innerWidth;
-      vm.menuBarMobile = size <= 981;
+      this.menuBarMobile = size <= 981;
       this.selectedColumn = this.columns[0];
     };
     this.getColumns();
@@ -183,6 +187,7 @@ export default {
       const id = this.$route.params.idBoard;
       boardService.getBoardById(id).then(res => {
         this.board = res.data.board;
+        this.$socket.emit("socketUpdateColumn");
       });
     },
     addColumn() {
@@ -194,7 +199,7 @@ export default {
       if (this.columns.length <= 4) {
         columnService.createColumn(data).then(res => {
           toast.open("Coluna criada", "success");
-          this.getColumns();
+        this.$socket.emit("socketUpdateColumn");
         });
       }
     },
@@ -217,13 +222,13 @@ export default {
     updateColumn(column) {
       columnService.updateColumn(column).then(res => {
         toast.open(res.data.message, "success");
-        this.getColumns();
+        this.$socket.emit("socketUpdateColumn");
       });
     },
     deleteColumn(column) {
       columnService.deleteColumn(column.column_id).then(res => {
         toast.open(`Coluna ${column.title} deletada`, "");
-        this.getColumns();
+        this.$socket.emit("socketUpdateColumn");
       });
     },
     createCard(column) {
@@ -235,7 +240,7 @@ export default {
         };
         cardService.createCard(data).then(res => {
           toast.open("Card criado", "success");
-          this.getColumns();
+          this.$socket.emit("socketUpdateColumn");
           this.description = "";
           this.isModalVisible = false;
         });
@@ -244,13 +249,13 @@ export default {
     updateCard(card) {
       cardService.updateCard(card).then(res => {
         toast.open("Card atualizado", "success");
-        this.getColumns();
+        this.$socket.emit("socketUpdateColumn");
       });
     },
     deleteCard(card_id) {
       cardService.deleteCard(card_id).then(res => {
         toast.open("Card deletado", "");
-        this.getColumns();
+        this.$socket.emit("socketUpdateColumn");
       });
     },
     selectColumn(column, index) {
@@ -338,12 +343,12 @@ export default {
     flex: 1 1 33.33%;
     padding: 10px 20px;
     border-radius: 4px;
-    @media(max-width: 981px){
+    @media (max-width: 981px) {
       display: table;
       padding-bottom: 100px;
       margin-bottom: 100px;
       overflow: auto;
-     }
+    }
     .draggable-item {
       color: #fff;
       position: relative;
