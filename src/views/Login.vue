@@ -49,12 +49,26 @@
         </sy-input>
         <sy-input>
           <label>Repita a senha</label>
-          <input type="password" v-model="user.password" />
+          <input
+            type="password"
+            v-model="user.password"
+            :class="{'hasError':(user.firstPassword.length && user.password.length) && (user.firstPassword != user.password)}"
+          />
+          <span
+            class="alert"
+            v-if="(user.firstPassword.length && user.password.length) && (user.firstPassword != user.password)"
+          >Senhas não conferem</span>
         </sy-input>
       </div>
       <div class="action-btns">
         <sy-button outline @click="register = !register">Login</sy-button>
-        <sy-button @click="signup()">Cadastrar</sy-button>
+        <sy-button
+          @click="signup()"
+          :disabled="
+        user.name &&
+        user.email &&
+        (user.firstPassword.length && user.password.length) && (user.firstPassword != user.password)"
+        >Cadastrar</sy-button>
       </div>
     </section>
   </div>
@@ -92,26 +106,38 @@ export default {
         password: "",
         firstPassword: ""
       },
-      register: false
+      register: false,
+      vm: Object
     };
+  },
+  mounted() {
+    this.vm = this;
+  },
+  computed: {
+    computedProperty() {
+      return this.user.firstPassword, this.user.password;
+    }
   },
   methods: {
     login() {
       let vm = this;
-      auth.login(this.user.email, this.user.password).then(res => {
-        if (res.data.auth) {
-          localStorage.setItem("uid", res.data.id_user);
-          localStorage.setItem("uitoken", res.data.token);
-          window.location.href = "/boards";
-          toast.open("Seja bem vindo!", "success");
-        } else {
-          this.error = true;
-          setTimeout(() => {
-            this.error = false;
-          }, 2000);
-          toast.open("Login Invalido", "error");
-        }
-      });
+      auth
+        .login(this.user.email, this.user.password)
+        .then(res => {
+          if (res.data.auth) {
+            localStorage.setItem("uid", res.data.user_id);
+            localStorage.setItem("uitoken", res.data.token);
+            window.location.href = "/boards";
+            toast.open("Seja bem vindo!", "success");
+          } else {
+            this.error = true;
+            setTimeout(() => {
+              this.error = false;
+            }, 2000);
+            toast.open("Login Invalido", "error");
+          }
+        })
+        .catch(err => toast.open("Login Invalido", "error"));
     },
     signup() {
       const user = {

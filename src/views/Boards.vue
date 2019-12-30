@@ -26,7 +26,7 @@
             <router-link
               v-if="!board.in_voting"
               class="action-link"
-              :to="'/board/'+ board.board_id"
+              :to="'/board/'+ board.id"
               :col="3"
             >
               <sy-title black normal>{{board.title}}</sy-title>
@@ -36,7 +36,7 @@
               </sy-title>
               <sy-title black normal sub class="f-2" style="white-space: nowrap">
                 <i class="material-icons mr-2">date_range</i>
-                {{board.created_date | formatDate}}
+                {{board.created_at | formatDate}}
                 <span
                   class="span-my-retros"
                 >{{ board.in_voting ? '-Em votação' : ''}}</span>
@@ -55,7 +55,7 @@
                   <i class="material-icons">edit</i>
                 </sy-button>
                 <sy-button icon>
-                  <i class="material-icons" @click="deleteBoard(board.board_id)">delete</i>
+                  <i class="material-icons" @click="deleteBoard(board.id)">delete</i>
                 </sy-button>
               </section>
               <!-- On edit          -->
@@ -150,15 +150,13 @@ export default {
     this.load;
   },
   sockets: {
-    connect: function() {
-      console.log("socket connected");
-    },
+    connect: function() {}
   },
   methods: {
     getBoards() {
       let vm = this;
       boardService.getBoards().then(res => {
-        vm.boards = res.data.boards;
+        vm.boards = res.data || [];
       });
     },
     showModal() {

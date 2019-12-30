@@ -1,9 +1,10 @@
 <template>
-  <sy-input>
+  <sy-input class="label-edit">
+    <span v-show="!canEdit" class="canEdit" :style="{ color : color }">{{label}}</span>
     <span
-      class="canEdit"
+      class="canEdit enable-edit"
       v-bind:style="{ color : color }"
-      v-show="!editing"
+      v-show="!editing && canEdit"
       @click="toggleEdit($event)"
     >{{label}}</span>
     <input
@@ -15,7 +16,7 @@
     <textarea
       v-show="editing && !input"
       v-model="newLabel"
-      @keyup.enter.native="saveEdit(newLabel)"
+      @keyup.enter="saveEdit(newLabel)"
       @blur="saveEdit(newLabel)"
     ></textarea>
   </sy-input>
@@ -30,7 +31,8 @@ export default {
   props: {
     label: String,
     input: Boolean,
-    color: String
+    color: String,
+    canEdit: Boolean
   },
   data() {
     return {
@@ -52,15 +54,27 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.label-edit {
+  max-width: 300px;
+  display: block;
+  word-break: break-all;
+}
 .canEdit {
   padding: 9px 10px;
   cursor: text;
-  height: 38px;
   width: 100%;
   border-radius: 4px;
-  &:hover {
-    background: #ffffff;
-    color: #5d5d5d !important;
+  &::-moz-selection {
+    background: yellow;
+  }
+  &::selection {
+    background: yellow;
+  }
+  &.enable-edit {
+    &:hover {
+      background: #ffffff;
+      color: #5d5d5d !important;
+    }
   }
 }
 .canEditInput {

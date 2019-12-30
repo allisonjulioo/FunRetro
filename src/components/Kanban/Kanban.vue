@@ -7,13 +7,19 @@
         <sy-title
           sub
           style="margin: 0; font-size: 12px;"
-        >Criado em: {{board.created_date | formatDate}}</sy-title>
+        >Criado em: {{board.created_at | formatDate}}</sy-title>
       </sy-title>
-      <sy-button
-        @click="addColumn('AddNew')"
-        :disabled="columns.length >= 4"
-        :class="{'disabled' : columns.length >= 4}"
-      >Nova coluna</sy-button>
+      <div style="display: flex">
+        <sy-button
+          v-if="true"
+          @click="addColumn('AddNew')"
+          :disabled="columns.length >= 4"
+          :class="{'disabled' : columns.length >= 4}"
+        >Nova coluna</sy-button>
+        <sy-button class="pdf" @click="createPDF()" primary>
+          <i class="material-icons">picture_as_pdf</i> Exportar pdf
+        </sy-button>
+      </div>
     </div>
     <Container
       lock-axis="x,y"
@@ -37,12 +43,13 @@
               <input v-model="column.color" type="color" name @change="updateColumn(column)" />
             </label>
             <inline-edit
+              :can-edit="true"
               :label="column.title"
               @lchanged="$event => {column.title = $event; updateColumn(column)}"
               input
             />
           </sy-title>
-          <sy-button icon>
+          <sy-button icon v-if="true">
             <i class="material-icons" @click="deleteColumn(column)">delete</i>
           </sy-button>
         </div>
@@ -57,19 +64,38 @@
           :drag-begin-delay="500"
           group-name="1"
           :get-child-payload="getChildPayload"
-          @drop="onInnerDrop(column, $event)"
+          @drop="onInnerDrop(column.cards, $event)"
           :drop-placeholder="dropPlaceholderOptions"
         >
           <Draggable v-for="(card, key) in column.cards" :key="key">
             <sy-card class="draggable-item" v-bind:style="{ backgroundColor : column.color }">
               <inline-edit
+                :can-edit="user_id_logged == card.user_id"
                 :label="card.content"
                 @lchanged="$event =>{ card.content = $event, updateCard(card)}"
                 :color="'#fff'"
               />
-              <sy-button icon v-bind:style="{ backgroundColor : column.color + '!important' }">
-                <i class="material-icons" @click="deleteCard(card.card_id)">delete</i>
+              <sy-button
+                v-if="user_id_logged == card.user_id"
+                icon
+                v-bind:style="{ backgroundColor : column.color + '!important' }"
+                class="delete"
+              >
+                <i class="material-icons" @click="deleteCard(card)">delete</i>
               </sy-button>
+              <div class="dot-infos">
+                <div class="avatar">
+                  <img src="../../assets/avatar.png" width="30" alt />
+                  <div class="info">
+                    <img src alt />
+                    <span>{{card.user.name}}</span>
+                  </div>
+                </div>
+                <sy-button outline class="like" @click="addLike(card)">
+                  <b>{{card.likes ? '('+card.likes+')' : ''}}</b>
+                  <i class="material-icons">thumb_up</i>
+                </sy-button>
+              </div>
             </sy-card>
           </Draggable>
         </Container>
@@ -128,7 +154,10 @@ import InlineEdit from "@/components/InlineEdit/InlineEdit.vue";
 import columnService from "@/services/column";
 import boardService from "@/services/boards";
 import cardService from "@/services/cards";
+import userService from "@/services/users";
 import toast from "@/services/toaster";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 export default {
   name: "Kanban",
@@ -159,10 +188,11 @@ export default {
       selectedColumn: Object,
       board: {
         title: String,
-        created_date: Date,
+        created_at: Date,
         limit_votes: Boolean,
         in_voting: Boolean
-      }
+      },
+      user_id_logged: localStorage.getItem("uid")
     };
   },
   sockets: {
@@ -171,52 +201,69 @@ export default {
     }
   },
   created() {
+    localStorage.setItem("bid", this.$route.params.idBoard);
+    let vm = this;
     let size = window.innerWidth;
     this.menuBarMobile = size <= 981;
     this.selectedColumn = this.columns[0];
     window.onresize = function(e) {
       let size = window.innerWidth;
-      this.menuBarMobile = size <= 981;
-      this.selectedColumn = this.columns[0];
+      vm.menuBarMobile = size <= 981;
+      vm.selectedColumn = vm.columns[0];
     };
     this.getColumns();
-    this.getInfoBoard();
   },
   methods: {
-    getInfoBoard() {
-      const id = this.$route.params.idBoard;
-      boardService.getBoardById(id).then(res => {
-        this.board = res.data.board;
-        this.$socket.emit("socketUpdateColumn");
-      });
+    createPDF() {
+      var doc = new jsPDF();
+      let cdrs = [];
+      doc.setFontSize(22);
+      doc.text("This is a title", 20, 20);
+      let tcards = [];
+      for (let i in this.columns) {
+        let column = this.columns[i];
+        let bcards = [];
+        tcards.push([column.title]);
+        for (let j in column.cards) {
+          let card = column.cards[j];
+          if (card.column_id == this.columns[i].id) {
+            bcards.push(card);
+          }
+        }
+        cdrs.push(bcards);
+      }
+      for (let i in this.columns) {
+        let dd = [];
+        dd.push(cdrs[i].map(res => res.content));
+        let dd3 = [];
+        dd3.push([dd[i]]);
+
+        doc.autoTable({
+          head: [tcards[i]],
+          body: [dd3]
+        });
+      }
+      doc.save(`${this.board.title} - ${this.$options.filters.formatDate(this.board.created_at)} .pdf`);
     },
     addColumn() {
       const data = {
         title: "Nova coluna",
         color: "#0097ff",
-        board_id: this.board.board_id
+        id: this.board.id
       };
       if (this.columns.length <= 4) {
         columnService.createColumn(data).then(res => {
           toast.open("Coluna criada", "success");
-        this.$socket.emit("socketUpdateColumn");
+          this.$socket.emit("socketUpdateColumn");
         });
       }
     },
     getColumns() {
+      let vm = this;
       const id = this.$route.params.idBoard;
       columnService.getColumns(id).then(res => {
-        let data = res.data.columns.length ? res.data.columns : [];
-        if (res.data.columns.length)
-          data.forEach(column => {
-            this.columns = res.data.columns;
-            this.selectedColumn = this.columns[0];
-            cardService
-              .getCardsByIdColumn(column.board_id, column.column_id)
-              .then(res => {
-                column.cards = res.data.cards;
-              });
-          });
+        this.board = res.data;
+        vm.columns = res.data.columns;
       });
     },
     updateColumn(column) {
@@ -226,8 +273,8 @@ export default {
       });
     },
     deleteColumn(column) {
-      columnService.deleteColumn(column.column_id).then(res => {
-        toast.open(`Coluna ${column.title} deletada`, "");
+      columnService.deleteColumn(column).then(res => {
+        toast.open(`Coluna ${column.title} deletada`, "success");
         this.$socket.emit("socketUpdateColumn");
       });
     },
@@ -236,7 +283,7 @@ export default {
         const data = {
           content: this.description,
           board_id: column.board_id,
-          column_id: column.column_id
+          id: column.id
         };
         cardService.createCard(data).then(res => {
           toast.open("Card criado", "success");
@@ -246,15 +293,20 @@ export default {
         });
       }
     },
+    addLike(card){
+      card.likes  = card.likes +1;
+      this.updateCard(card)
+
+    },
     updateCard(card) {
       cardService.updateCard(card).then(res => {
         toast.open("Card atualizado", "success");
         this.$socket.emit("socketUpdateColumn");
       });
     },
-    deleteCard(card_id) {
-      cardService.deleteCard(card_id).then(res => {
-        toast.open("Card deletado", "");
+    deleteCard(card) {
+      cardService.deleteCard(card).then(res => {
+        toast.open("Card deletado", "success");
         this.$socket.emit("socketUpdateColumn");
       });
     },
@@ -270,10 +322,10 @@ export default {
     onInnerDrop(column, dropResult) {
       const newItems = [...this.columns];
       const index = newItems.indexOf(column);
-      newItems[index].items = applyDrag(newItems[index].items, dropResult);
+      newItems[index].cards = applyDrag(newItems[index].cards, dropResult);
     },
     getChildPayload(index) {
-      return this.columns[index].items[index];
+      return this.columns[index].cards[index];
     },
     dragStart(index) {
       console.log("drag started", index);
@@ -290,6 +342,14 @@ export default {
 <style lang='scss' scoped>
 .smooth-dnd-container {
   min-height: 90%;
+}
+.pdf {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  i {
+    color: #f16692;
+  }
 }
 #color {
   cursor: pointer;
@@ -355,7 +415,7 @@ export default {
       cursor: move;
       min-height: 80px;
       margin-bottom: 10px;
-      button {
+      .delete {
         float: right;
         position: absolute;
         top: 1px;
@@ -380,6 +440,35 @@ export default {
       }
       * {
         color: #5f5f5f;
+      }
+    }
+    .dot-infos {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+      margin: 20px 10px 0;
+      .avatar {
+        display: flex;
+        align-items: center;
+        * {
+          color: #fff;
+        }
+        img {
+          margin-right: 5px;
+          border-radius: 40px;
+        }
+      }
+      .like {
+        width: auto;
+        min-width: auto;
+        display: flex;
+        align-items: center;
+        border: none;
+        margin: 0;
+        b {
+          margin: 5px 10px 0;
+        }
       }
     }
   }

@@ -15,8 +15,8 @@ export const BtnOption = {
   icon: Boolean,
 };
 
-export const SyButton = styled('button', BtnOption)` 
-  position: relative; 
+export const SyButton = styled('button', BtnOption)`
+  position: relative;
   cursor: pointer;
   font-size: 12px;
   width: ${props => (props.avatar ? '40px' : 'auto')};
@@ -56,15 +56,15 @@ export const SyButton = styled('button', BtnOption)`
   }};
   color: ${props => (props.primary ? txtColor.primary : txtColor.light)};
   ${props => (props.avatar ? 'box-shadow: 0 1px 2px 0 rgba(39, 40, 50, 0.15)' : '')};
-  ${props => (props.raised ? ` 
+  ${props => (props.raised ? `
       color: ${txtColor.light} !important;
-      background: ${bgColor.primary} !important; 
-      border-color: ${bgColor.primary} !important; 
+      background: ${bgColor.primary} !important;
+      border-color: ${bgColor.primary} !important;
   ` : '')}
-  ${props => (props.outline ? ` 
+  ${props => (props.outline ? `
       color: ${txtColor.light} !important;
-      background: transparent !important; 
-      border-color: ${bgColor.light} !important; 
+      background: transparent !important;
+      border-color: ${bgColor.light} !important;
   ` : '')}
   ${props => (props.icon ? `
     cursor: pointer;
@@ -84,7 +84,7 @@ export const SyButton = styled('button', BtnOption)`
     &:active{
       box-shadow: none !important;
     }
-  ` : '')} 
+  ` : '')}
   @media screen and (max-width: 981px) {
      min-width: 100px;
   }
@@ -93,8 +93,9 @@ export const SyButton = styled('button', BtnOption)`
   }
   :disabled {
     cursor: default;
-    background: #eee;
+    background: #eeeeeefc;
     border: none;
+    color: #b3b3b3;
   }
   &:active {
     box-shadow: inset 1px 1px 2px rgba(0,0,0,0.1);

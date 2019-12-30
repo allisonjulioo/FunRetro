@@ -1,12 +1,12 @@
 import config from '@/services/config'
 import axios from 'axios'
 const user_id = localStorage.getItem('uid')
-const endpoint = `${config.apiUrl}/api/columns`
+const endpoint = `${config.apiUrl}/api/users/${user_id}/boards`
 export default {
-  getColumns: column_id => {
+  getColumns: board_id => {
     return axios({
       method: 'get',
-      url: `${endpoint}/${user_id}/${column_id}`
+      url: `${endpoint}/${board_id}/columns`
     })
       .then(response => response)
       .catch(error => error)
@@ -17,7 +17,7 @@ export default {
     params.append('color', data.color)
     return axios({
       method: 'post',
-      url: `${endpoint}/${data.board_id}`,
+      url: `${endpoint}/${data.id}/columns`,
       data: params
     })
       .then(response => response)
@@ -29,18 +29,18 @@ export default {
     params.append('color', data.color)
     return axios({
       method: 'patch',
-      url: `${endpoint}/${data.column_id}`,
+      url: `${endpoint}/${data.board_id}/columns/${data.id}`,
       data: params
     })
       .then(response => response)
       .catch(error => error)
   },
-  deleteColumn: column_id => {
+  deleteColumn: data => {
     return axios({
       method: 'delete',
-      url: `${endpoint}/${column_id}`
+      url: `${endpoint}/${data.board_id}/columns/${data.id}`,
     })
       .then(response => response)
       .catch(error => error)
-  },
+  }
 }

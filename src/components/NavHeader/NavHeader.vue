@@ -103,8 +103,8 @@ export default {
     }
     auth.getUser().then(res => {
       if(!res.data.error){
-        res ? vm.userName = res.data.data.name.charAt(0).toUpperCase() + res.data.data.name.substr(1) : '';
-        let split = res.data.data.name.split(" ");
+        res ? vm.userName = res.data.name.charAt(0).toUpperCase() + res.data.name.substr(1) : '';
+        let split = res.data.name.split(" ");
         vm.userInitials = split[0].charAt(0).toUpperCase();
       }
     })

@@ -1,22 +1,15 @@
 import config from '@/services/config'
 import axios from 'axios'
 const user_id = localStorage.getItem('uid')
-const endpoint = `${config.apiUrl}/api/cards`
+const board_id = localStorage.getItem('bid')
+const endpoint = `${config.apiUrl}/api/users/${user_id}/boards/${board_id}/columns`
 export default {
-  getCardsByIdColumn: (board_id, column_id) => {
-    return axios({
-      method: 'get',
-      url: `${endpoint}/${board_id}/${column_id}`
-    })
-      .then(response => response)
-      .catch(error => error)
-  },
   createCard: data => {
     const params = new URLSearchParams()
     params.append('content', data.content)
     return axios({
       method: 'post',
-      url: `${endpoint}/${data.board_id}/${data.column_id}/${user_id}`,
+      url: `${endpoint}/${data.id}/cards`,
       data: params
     })
       .then(response => response)
@@ -25,18 +18,19 @@ export default {
   updateCard: data => {
     const params = new URLSearchParams()
     params.append('content', data.content)
+    params.append('likes', data.likes)
     return axios({
       method: 'patch',
-      url: `${endpoint}/${data.card_id}`,
+      url: `${endpoint}/${data.column_id}/cards/${data.id}`,
       data: params
     })
       .then(response => response)
       .catch(error => error)
   },
-  deleteCard: card_id => {
+  deleteCard: data => {
     return axios({
       method: 'delete',
-      url: `${endpoint}/${card_id}`
+      url: `${endpoint}/${data.column_id}/cards/${data.id}`,
     })
       .then(response => response)
       .catch(error => error)

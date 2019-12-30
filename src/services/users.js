@@ -1,25 +1,24 @@
 import config from '@/services/config'
 import axios from 'axios'
-const user_id = localStorage.getItem('uid')
-const enpoint = `${config.apiUrl}/api/users/${user_id}/boards`
+const enpoint = `${config.apiUrl}/api/users`
 export default {
-  getBoards: () => {
+  getUsers: () => {
     return axios({
       method: 'get',
-      url: `${enpoint}`
+      url: `${enpoint}/${user_id}`
     })
       .then(response => response)
       .catch(error => error)
   },
-  getBoardById: board_id => {
+  getUserById: user_id => {
     return axios({
       method: 'get',
-      url: `${config.apiUrl}/api/board/${board_id}`
+      url: `${config.apiUrl}/api/users/${user_id}`
     })
       .then(response => response)
       .catch(error => error)
   },
-  createBoard: data => {
+  createUser: data => {
     const params = new URLSearchParams()
     params.append('title', data.title)
     params.append('limit_votes', data.limit_votes)
@@ -32,23 +31,22 @@ export default {
       .then(response => response)
       .catch(error => error)
   },
-  updateBoard: data => {
+  updateUser: data => {
     const params = new URLSearchParams()
     params.append('title', data.title)
     params.append('limit_votes', data.limit_votes)
     return axios({
       method: 'patch',
-      url: `${enpoint}/${data.id}`,
+      url: `${enpoint}/${user_id}/${data.board_id}`,
       data: params
     })
       .then(response => response)
       .catch(error => error)
   },
-  deleteBoard: board_id => {
-    console.log(`${enpoint}/${board_id}`, board_id)
+  deleteUser: board_id => {
     return axios({
       method: 'delete',
-      url: `${enpoint}/${board_id}`
+      url: `${enpoint}/${user_id}/${board_id}`
     })
       .then(response => response)
       .catch(error => error)
