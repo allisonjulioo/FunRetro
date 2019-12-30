@@ -4,6 +4,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/css/app.a25978f4.css"
   },
   {
+    "revision": "518c3da5334abb312257378987dacd14",
+    "url": "/favicon.png"
+  },
+  {
     "revision": "0509ab09c1b0d2200a4135803c91d6ce",
     "url": "/fonts/MaterialIcons-Regular.0509ab09.woff2"
   },
