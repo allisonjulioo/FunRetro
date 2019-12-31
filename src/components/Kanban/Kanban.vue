@@ -36,10 +36,12 @@
         v-show="(menuBarMobile && selectedColumn == column) || !menuBarMobile"
         :key="index"
         :class="column.className"
+         :style="{ backgroundColor : column.color }"
       >
         <div class="title column-drag-handle">
           <sy-title normal class="header-column">
-            <label id="color" v-bind:style="{ backgroundColor : column.color }">
+            <label id="color" :style="{ backgroundColor : column.color }">
+              <img src="../../assets/color.png" alt="" width="20">
               <input v-model="column.color" type="color" name @change="updateColumn(column)" />
             </label>
             <inline-edit
@@ -68,17 +70,16 @@
           :drop-placeholder="dropPlaceholderOptions"
         >
           <Draggable v-for="(card, key) in column.cards" :key="key">
-            <sy-card class="draggable-item" v-bind:style="{ backgroundColor : column.color }">
+            <sy-card class="draggable-item">
               <inline-edit
                 :can-edit="user_id_logged == card.user_id"
                 :label="card.content"
                 @lchanged="$event =>{ card.content = $event, updateCard(card)}"
-                :color="'#fff'"
+                :color="'#000'"
               />
               <sy-button
                 v-if="user_id_logged == card.user_id"
                 icon
-                v-bind:style="{ backgroundColor : column.color + '!important' }"
                 class="delete"
               >
                 <i class="material-icons" @click="deleteCard(card)">delete</i>
@@ -399,10 +400,8 @@ export default {
   }
   .column {
     user-select: none;
-    margin: 0 10px;
     flex: 1 1 33.33%;
     padding: 10px 20px;
-    border-radius: 4px;
     @media (max-width: 981px) {
       display: table;
       padding-bottom: 100px;

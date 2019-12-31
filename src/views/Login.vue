@@ -3,7 +3,7 @@
     <img src="../assets/brand_light.svg" alt width="150" />
     <section id="form" v-if="!register" class="animated fadeIn">
       <sy-title style="color: white; text-align: center">Login</sy-title>
-      <form @submit="login()">
+      <form method="POST"  @submit="login($event)">
         <sy-input style="margin-bottom: 20px;">
           <label>E-mail</label>
           <input
@@ -26,10 +26,11 @@
           />
           <span class="alert" v-if="error">Senha inválido</span>
         </sy-input>
+        <input type="submit" style="display: none" @submit="login($event)" >
       </form>
       <div class="action-btns">
         <sy-button outline @click="register = !register">Cadastrar</sy-button>
-        <sy-button @click="login()">Entrar</sy-button>
+        <sy-button :disabled="!user.email" @click="login()">Entrar</sy-button>
       </div>
     </section>
     <section id="form" v-if="register" class="animated fadeIn">
@@ -119,7 +120,8 @@ export default {
     }
   },
   methods: {
-    login() {
+    login(e) {
+      e.preventDefault()
       let vm = this;
       auth
         .login(this.user.email, this.user.password)
@@ -130,14 +132,12 @@ export default {
             window.location.href = "/boards";
             toast.open("Seja bem vindo!", "success");
           } else {
-            this.error = true;
-            setTimeout(() => {
-              this.error = false;
-            }, 2000);
-            toast.open("Login Invalido", "error");
+            vm.alertError();
           }
         })
-        .catch(err => toast.open("Login Invalido", "error"));
+        .catch(err => {
+          vm.alertError();
+        });
     },
     signup() {
       const user = {
@@ -150,6 +150,17 @@ export default {
           this.login();
         }
       });
+    },
+    alertError() {
+      this.error = true;
+      setTimeout(() => {
+        this.error = false;
+      }, 2000);
+      toast.open("Login Invalido", "error");
+    },
+    validEmail: function(email) {
+      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
     }
   }
 };
