@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.d00c73f2cbea37d1ee946632c83857dd.js"
+  "/precache-manifest.44eb1fc9158118307644cf140c0cb40e.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "sympla-retro"});
