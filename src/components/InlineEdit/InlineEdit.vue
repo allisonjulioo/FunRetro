@@ -62,7 +62,6 @@ export default {
 .canEdit {
   padding: 9px 10px;
   cursor: text;
-  color: #ffffff;
   width: 100%;
   border-radius: 4px;
   &::-moz-selection {

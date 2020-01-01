@@ -3,10 +3,11 @@
     <img src="../assets/brand_light.svg" alt width="150" />
     <section id="form" v-if="!register" class="animated fadeIn">
       <sy-title style="color: white; text-align: center">Login</sy-title>
-      <form method="POST"  @submit="login($event)">
+      <form method="POST" @submit="login($event)">
         <sy-input style="margin-bottom: 20px;">
           <label>E-mail</label>
           <input
+           :disabled="loading"
             type="email"
             class="animated fast"
             v-model="user.email"
@@ -19,6 +20,7 @@
         <sy-input>
           <label>Password</label>
           <input
+           :disabled="loading"
             type="password"
             class="animated fast"
             v-model="user.password"
@@ -26,11 +28,14 @@
           />
           <span class="alert" v-if="error">Senha inválido</span>
         </sy-input>
-        <input type="submit" style="display: none" @submit="login($event)" >
+        <input type="submit" style="display: none" @submit="login($event)" />
       </form>
       <div class="action-btns">
-        <sy-button outline @click="register = !register">Cadastrar</sy-button>
-        <sy-button :disabled="!user.email" @click="login()">Entrar</sy-button>
+        <sy-button :disabled="loading" outline @click="register = !register">Cadastrar</sy-button>
+        <sy-button :disabled="!user.email || loading " @click="login($event)">
+          <i v-if="loading" class="loading animated material-icons">cached</i>
+          {{loading ?'Aguarde': 'Entrar'}}
+        </sy-button>
       </div>
     </section>
     <section id="form" v-if="register" class="animated fadeIn">
@@ -108,6 +113,7 @@ export default {
         firstPassword: ""
       },
       register: false,
+      loading: false,
       vm: Object
     };
   },
@@ -121,11 +127,13 @@ export default {
   },
   methods: {
     login(e) {
-      e.preventDefault()
+      this.loading = true;
+      e.preventDefault();
       let vm = this;
       auth
         .login(this.user.email, this.user.password)
         .then(res => {
+          vm.loading = false;
           if (res.data.auth) {
             localStorage.setItem("uid", res.data.user_id);
             localStorage.setItem("uitoken", res.data.token);
@@ -136,6 +144,7 @@ export default {
           }
         })
         .catch(err => {
+          vm.loading = false;
           vm.alertError();
         });
     },
@@ -199,6 +208,9 @@ export default {
       height: 50px;
       border: solid 1px #ffffff;
     }
+    button {
+      line-height: 2.2 !important;
+    }
     .action-btns {
       margin-top: 40px;
       display: flex;
@@ -209,6 +221,18 @@ export default {
           width: 100%;
           height: 50px;
           margin: 10px 0;
+        }
+      }
+      .loading {
+        animation: rotate 1s linear infinite;
+        animation-fill-mode: linear;
+      }
+      @keyframes rotate {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
         }
       }
     }

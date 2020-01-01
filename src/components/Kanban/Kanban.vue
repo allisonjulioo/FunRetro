@@ -9,7 +9,20 @@
           style="margin: 0; font-size: 12px;"
         >Criado em: {{board.created_at | formatDate}}</sy-title>
       </sy-title>
-      <div style="display: flex">
+      <dropdown :toggle-dropdown="isDropdownVisible" v-if="menuBarMobile">
+        <template v-slot:button>
+          <sy-button class="dropdown-toggle" icon @click="showDropdown">
+            <span class="material-icons">more_vert</span>
+          </sy-button>
+        </template>
+        <template v-slot:template>
+          <ul class="menu">
+            <li @click="addColumn('AddNew')"  :disabled="columns.length >= 4">Nova coluna</li>
+            <li @click="createPDF()">Exportar pdf</li>
+          </ul>
+        </template>
+      </dropdown>
+      <div style="display: flex" v-if="!menuBarMobile">
         <sy-button
           v-if="true"
           @click="addColumn('AddNew')"
@@ -36,12 +49,10 @@
         v-show="(menuBarMobile && selectedColumn == column) || !menuBarMobile"
         :key="index"
         :class="column.className"
-         :style="{ backgroundColor : column.color }"
       >
         <div class="title column-drag-handle">
           <sy-title normal class="header-column">
-            <label id="color" :style="{ backgroundColor : column.color }">
-              <img src="../../assets/color.png" alt="" width="20">
+            <label id="color" v-bind:style="{ backgroundColor : column.color }">
               <input v-model="column.color" type="color" name @change="updateColumn(column)" />
             </label>
             <inline-edit
@@ -55,13 +66,6 @@
             <i class="material-icons" @click="deleteColumn(column)">delete</i>
           </sy-button>
         </div>
-        <button
-          class="add-task"
-          @click="showModal(column)"
-          :style=" menuBarMobile &&{ background: column.color }"
-        >
-          <i class="material-icons">add</i>
-        </button>
         <Container
           :drag-begin-delay="500"
           group-name="1"
@@ -70,16 +74,17 @@
           :drop-placeholder="dropPlaceholderOptions"
         >
           <Draggable v-for="(card, key) in column.cards" :key="key">
-            <sy-card class="draggable-item">
+            <sy-card class="draggable-item" v-bind:style="{ backgroundColor : column.color }">
               <inline-edit
                 :can-edit="user_id_logged == card.user_id"
                 :label="card.content"
                 @lchanged="$event =>{ card.content = $event, updateCard(card)}"
-                :color="'#000'"
+                :color="'#fff'"
               />
               <sy-button
                 v-if="user_id_logged == card.user_id"
                 icon
+                v-bind:style="{ backgroundColor : column.color + '!important' }"
                 class="delete"
               >
                 <i class="material-icons" @click="deleteCard(card)">delete</i>
@@ -99,6 +104,14 @@
               </div>
             </sy-card>
           </Draggable>
+
+          <button
+            class="add-task"
+            @click="showModal(column)"
+            :style=" menuBarMobile &&{ background: column.color }"
+          >
+            <i class="material-icons">add</i>
+          </button>
         </Container>
       </Draggable>
     </Container>
@@ -159,6 +172,7 @@ import userService from "@/services/users";
 import toast from "@/services/toaster";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import Dropdown from "@/components/Dropdown/Dropdown";
 
 export default {
   name: "Kanban",
@@ -171,11 +185,13 @@ export default {
     SyContainer,
     SyInput,
     Modal,
-    InlineEdit
+    InlineEdit,
+    Dropdown
   },
   data() {
     return {
       isModalVisible: false,
+      isDropdownVisible: false,
       description: "",
       selectedCard: "",
       index: 0,
@@ -186,7 +202,7 @@ export default {
         showOnTop: true
       },
       menuBarMobile: false,
-      selectedColumn: Object,
+      selectedColumn: {},
       board: {
         title: String,
         created_at: Date,
@@ -206,11 +222,11 @@ export default {
     let vm = this;
     let size = window.innerWidth;
     this.menuBarMobile = size <= 981;
-    this.selectedColumn = this.columns[0];
+    this.selectedColumn = (this.selectedColumn && this.selectedColumn.board_id ) ? this.selectedColumn : this.columns[0];
     window.onresize = function(e) {
       let size = window.innerWidth;
       vm.menuBarMobile = size <= 981;
-      vm.selectedColumn = vm.columns[0];
+      vm.selectedColumn = (vm.selectedColumn && vm.selectedColumn.board_id ) ? vm.selectedColumn : vm.columns[0];
     };
     this.getColumns();
   },
@@ -244,7 +260,11 @@ export default {
           body: [dd3]
         });
       }
-      doc.save(`${this.board.title} - ${this.$options.filters.formatDate(this.board.created_at)} .pdf`);
+      doc.save(
+        `${this.board.title} - ${this.$options.filters.formatDate(
+          this.board.created_at
+        )} .pdf`
+      );
     },
     addColumn() {
       const data = {
@@ -264,7 +284,13 @@ export default {
       const id = this.$route.params.idBoard;
       columnService.getColumns(id).then(res => {
         this.board = res.data;
-        vm.columns = res.data.columns;
+        this.columns = res.data.columns;
+        let selc =  JSON.parse(localStorage.getItem('column'))
+        let data = {data, ...selc}
+        console.log(data);
+
+        this.selectedColumn = selc ? data: this.columns[0];
+
       });
     },
     updateColumn(column) {
@@ -294,10 +320,9 @@ export default {
         });
       }
     },
-    addLike(card){
-      card.likes  = card.likes +1;
-      this.updateCard(card)
-
+    addLike(card) {
+      card.likes = card.likes + 1;
+      this.updateCard(card);
     },
     updateCard(card) {
       cardService.updateCard(card).then(res => {
@@ -312,6 +337,7 @@ export default {
       });
     },
     selectColumn(column, index) {
+      localStorage.setItem('column', JSON.stringify(column))
       this.selectedColumn = column;
     },
     openDropdown() {
@@ -324,6 +350,10 @@ export default {
       const newItems = [...this.columns];
       const index = newItems.indexOf(column);
       newItems[index].cards = applyDrag(newItems[index].cards, dropResult);
+    },
+    showDropdown(e) {
+      this.isDropdownVisible = !this.isDropdownVisible;
+      e.stopPropagation();
     },
     getChildPayload(index) {
       return this.columns[index].cards[index];
@@ -369,20 +399,24 @@ export default {
   width: 100%;
   height: calc(100vh - 80px);
   .add-task {
+    outline: none;
     cursor: pointer;
-    background: #c2c2c1;
-    color: #5f5f5f;
+    background: #ffffff;
+    color: #29292b;
     border: none;
     width: 100%;
     text-align: center;
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 20px 0;
-    height: 32px;
-    border-radius: 4px;
+    height: 60px;
+    width: 60px;
+    border-radius: 50px;
+    margin: 13px auto;
+    box-shadow: 0px 3px 4px rgba(51, 51, 51, 0.26);
+    &:focus{
+      background: #f4f4f4;
+    }
   }
   .header {
     background: #fff;
@@ -400,8 +434,10 @@ export default {
   }
   .column {
     user-select: none;
+    margin: 0 10px;
     flex: 1 1 33.33%;
-    padding: 10px 20px;
+    padding: 10px 10px;
+    border-radius: 4px;
     @media (max-width: 981px) {
       display: table;
       padding-bottom: 100px;
