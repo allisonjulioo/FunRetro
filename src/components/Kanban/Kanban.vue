@@ -203,6 +203,7 @@ export default {
       },
       menuBarMobile: false,
       selectedColumn: {},
+      indexColumn: 0,
       board: {
         title: String,
         created_at: Date,
@@ -222,11 +223,11 @@ export default {
     let vm = this;
     let size = window.innerWidth;
     this.menuBarMobile = size <= 981;
-    this.selectedColumn = (this.selectedColumn && this.selectedColumn.board_id ) ? this.selectedColumn : this.columns[0];
+    this.selectColumn()
     window.onresize = function(e) {
       let size = window.innerWidth;
       vm.menuBarMobile = size <= 981;
-      vm.selectedColumn = (vm.selectedColumn && vm.selectedColumn.board_id ) ? vm.selectedColumn : vm.columns[0];
+      this.selectColumn()
     };
     this.getColumns();
   },
@@ -285,11 +286,7 @@ export default {
       columnService.getColumns(id).then(res => {
         this.board = res.data;
         this.columns = res.data.columns;
-        let selc =  JSON.parse(localStorage.getItem('column'))
-        let data = {data, ...selc}
-        console.log(data);
-
-        this.selectedColumn = selc ? data: this.columns[0];
+        this.selectColumn()
 
       });
     },
@@ -337,8 +334,10 @@ export default {
       });
     },
     selectColumn(column, index) {
+      debugger
       localStorage.setItem('column', JSON.stringify(column))
-      this.selectedColumn = column;
+      this.selectedColumn = this.columns[index || this.indexColumn|| 0];
+      this.indexColumn = index || this.indexColumn|| 0;
     },
     openDropdown() {
       this.dropdown = true;

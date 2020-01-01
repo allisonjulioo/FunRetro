@@ -46,7 +46,7 @@ export const global = injectGlobal`
 .toast__container {
     display: block;
     position: fixed;
-    z-index: +1;
+    z-index: 9999;
     top: 4%;
     left: 50%;
     max-width: 300px;
