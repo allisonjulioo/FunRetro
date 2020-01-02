@@ -36,6 +36,12 @@ export default {
     const params = new URLSearchParams()
     params.append('title', data.title)
     params.append('limit_votes', data.limit_votes)
+    params.append('user_votes', data.user_votes)
+
+    if (data.in_voting == true) {
+      data.in_voting = 1
+    } else data.in_voting = 0
+    params.append('in_voting', data.in_voting)
     return axios({
       method: 'patch',
       url: `${enpoint}/${data.id}`,
@@ -45,7 +51,6 @@ export default {
       .catch(error => error)
   },
   deleteBoard: board_id => {
-    console.log(`${enpoint}/${board_id}`, board_id)
     return axios({
       method: 'delete',
       url: `${enpoint}/${board_id}`

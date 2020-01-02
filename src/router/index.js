@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Boards from '../views/Boards.vue'
+import Boards from '../views/Boards/Boards.vue'
 import CreateBoard from '../views/CreateBoard.vue'
 import LoginComponent from '../views/Login.vue'
 import Axios from 'axios'

@@ -23,6 +23,7 @@
 </template>
 <script>
 import { SyInput } from "@/ui-components";
+import "./InlineEdit.scss"
 export default {
   name: "InlineEdit",
   components: {
@@ -52,39 +53,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.label-edit {
-  max-width: 300px;
-  display: block;
-  word-break: break-all;
-}
-.canEdit {
-  padding: 9px 10px;
-  cursor: text;
-  width: 100%;
-  border-radius: 4px;
-  &::-moz-selection {
-    background: yellow;
-  }
-  &::selection {
-    background: yellow;
-  }
-  &.enable-edit {
-    &:hover {
-      background: #ffffff;
-      color: #5d5d5d !important;
-    }
-  }
-}
-.canEditInput {
-  padding: 4px 12px !important;
-  font-size: 14px;
-  font-weight: 600;
-  color: #50525f;
-  margin-left: -3px;
-  margin-top: -1px;
-  line-height: 0.1;
-  margin-bottom: 1px;
-}
-</style>

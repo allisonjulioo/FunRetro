@@ -2,22 +2,22 @@ import styled from "vue-styled-components";
 import { bgColor } from './colors.js';
 
 // --------------------------
-// Navigation 
+// Navigation
 // --------------------------
 const navProps = {
   sub: Boolean,
 };
 export const SyNav = styled('nav', navProps)`
   background-color: ${bgColor.primary};
-  height: 86px; 
+  height: 86px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
   border-bottom: 1px solid hsla(0, 0%, 100%, 0.25);
-  z-index: +1;
+  z-index: 9999;
   margin-bottom: 10px;
-  position: relative;  
+  position: relative;
   ${props => props.sub ? `
    padding-top: 21px;
    margin-top: -9px !important;
@@ -32,17 +32,17 @@ export const SyNav = styled('nav', navProps)`
       margin-top: 4px;
     }
   ` : ''}
-  a{ 
+  a{
     &.router-link-exact-active {
-     
+
     }
-  } 
+  }
   img{
         margin: 0 auto;
-        position: relative; 
+        position: relative;
 }`;
 // --------------------------
-// Sub Navigation 
+// Sub Navigation
 // --------------------------
 export const SySubNav = styled.div`
   position:sticky;
@@ -54,15 +54,15 @@ export const SySubNav = styled.div`
   align-items: center;
   box-shadow: 0 1px 2px 0 rgba(39, 40, 50, 0.15);
   z-index: +1;
-  section{ 
+  section{
   display: flex;
   align-items: center;
     h1,h2{
       flex: 11;
       font-weight: normal;
       font-size: 24px;
-      line-height: 1.25; 
+      line-height: 1.25;
     }
-    button{ 
+    button{
     }
   }`;

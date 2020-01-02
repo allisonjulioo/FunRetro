@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <nav-header></nav-header>
+    <nav-header v-if="this.$route.path !== '/login'"></nav-header>
     <router-view />
   </div>
 </template>
@@ -14,7 +14,7 @@ export default {
   },
   watch: {
     $route(to, from) {
-      this.$root.$emit('route:changed', true)
+      this.$root.$emit("route:changed", true);
     }
   }
 };

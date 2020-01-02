@@ -1,48 +1,58 @@
 <template>
   <div>
-    <time-line></time-line>
+    <!--<time-line></time-line> -->
     <sy-container>
       <section class="container-board">
-        <sy-title black class="title">
+        <sy-title black class="title" v-if="boards.length">
           <span>Meus boards</span>
-          <sy-button @click="showModal">+ Adicionar novo board</sy-button>
+          <sy-button @click="showModal">+ Novo board</sy-button>
         </sy-title>
         <Row>
-          <sy-card clickable def @click="showModal" class="con-cards" v-if="!boards.length">
-            <img class="empty-boards" src="../assets/empty.png" alt />
-            <sy-title>
-              Não há nada por aqui!
-              <sy-title normal black>clique em mim para adicionar</sy-title>
-            </sy-title>
-          </sy-card>
+          <sy-container style="text-align: center; margin-top: 60px;" v-if="!boards.length">
+            <img src="@/assets/empty.png" width="80%" alt style="max-width: 400px;" />
+            <br />
+            <sy-title>Parece que não há nada por aqui!</sy-title>
+            <sy-button @click="showModal">Adicione um novo board</sy-button>
+          </sy-container>
           <sy-card
             clickable
             hover
             class="boards"
             v-for="(board, index) in boards"
             :key="index"
-            :class="{'in_voting' : board.in_voting}"
+            :class="{'editing' : board.editing}"
           >
             <router-link
-              v-if="!board.in_voting"
+              v-if="!board.editing"
               class="action-link"
               :to="'/board/'+ board.id"
               :col="3"
             >
               <sy-title black normal>{{board.title}}</sy-title>
-              <sy-title black normal sub>
-                Votos por usuário
-                <b>{{board.limit_votes}}</b>
-              </sy-title>
-              <sy-title black normal sub class="f-2" style="white-space: nowrap">
-                <i class="material-icons mr-2">date_range</i>
-                {{board.created_at | formatDate}}
-                <span
-                  class="span-my-retros"
-                >{{ board.in_voting ? '-Em votação' : ''}}</span>
-              </sy-title>
             </router-link>
-            <sy-input v-if="board.in_voting" class="on-edit">
+            <sy-title black normal sub>
+              Votos
+              <b>{{board.user_votes}}</b>
+            </sy-title>
+            <sy-input class="checkbox" :for="board.id">
+              <input
+                @change="editBoard(board)"
+                v-model="board.in_voting"
+                type="checkbox"
+                :id="board.id"
+                class="tgl tgl-light"
+              />
+              <label class="tgl-btn" :for="board.id"></label>
+              <label :for="board.id" class="label">Iniciar votação</label>
+            </sy-input>
+            <sy-title black normal sub class="f-2" style="white-space: nowrap">
+              <i class="material-icons mr-2">date_range</i>
+              {{board.created_at | formatDate}}
+              <span
+                class="span-my-retros"
+              >{{ board.in_voting ? '-Em votação' : ''}}</span>
+            </sy-title>
+            <sy-input v-if="board.editing" class="on-edit">
               <label>Nome</label>
               <input v-model="board.title" type="text" />
               <label>Votos por usuário</label>
@@ -50,8 +60,13 @@
             </sy-input>
             <div class="actions">
               <!-- Default          -->
-              <section v-if="!board.in_voting">
-                <sy-button icon @click="board.in_voting = true">
+              <router-link v-if="!board.editing" :to="'/board/'+ board.id" :col="3">
+                <sy-button icon>
+                  <i class="material-icons">play_circle_filled</i>
+                </sy-button>
+              </router-link>
+              <section v-if="!board.editing">
+                <sy-button icon @click="board.editing = true">
                   <i class="material-icons">edit</i>
                 </sy-button>
                 <sy-button icon>
@@ -59,11 +74,11 @@
                 </sy-button>
               </section>
               <!-- On edit          -->
-              <section v-if="board.in_voting">
+              <section v-if="board.editing">
                 <sy-button icon @click="editBoard(board)">
                   <i class="material-icons">save</i>
                 </sy-button>
-                <sy-button icon @click="board.in_voting = false">
+                <sy-button icon @click="getBoards()">
                   <i class="material-icons">cancel</i>
                 </sy-button>
               </section>
@@ -100,6 +115,7 @@
 import TimeLine from "@/components/Timeline/TimeLine";
 import Modal from "@/components/Modal/Modal";
 import boardService from "@/services/boards";
+import "./Boards.scss";
 import {
   SyCard,
   Row,
@@ -129,7 +145,8 @@ export default {
       board: {
         title: "",
         limit_votes: 6,
-        in_voting: false
+        in_voting: false,
+        editing: false
       },
       boards: [],
       editMode: false
@@ -139,12 +156,6 @@ export default {
     load: async function() {
       await this.getBoards();
     }
-  },
-  created() {
-    // Emitting 'leave' event on tab closed event.
-    window.onbeforeunload = () => {
-      this.$socket.emit("leave", this.username);
-    };
   },
   mounted() {
     this.load;
@@ -156,6 +167,9 @@ export default {
     getBoards() {
       let vm = this;
       boardService.getBoards().then(res => {
+        for (let board of res.data) {
+          Object.assign(board, { editing: false });
+        }
         vm.boards = res.data || [];
       });
     },
@@ -186,113 +200,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-@import "../../variables/_colors.scss";
-.container-board {
-  margin-top: 40px;
-  @media (max-width: 981px) {
-    .con-cards {
-      margin-right: 0;
-    }
-  }
-}
-.span-my-retros {
-  color: $primary;
-  font-size: 18px;
-}
-.boards {
-  width: calc(25% - 30px);
-  margin-right: 20px;
-  max-width: 300px;
-  position: relative;
-  overflow: hidden;
-  @media (max-width: 981px) {
-    width: 100%;
-    margin-right: 0px;
-    max-width: 100%;
-    .actions {
-      opacity: 1 !important;
-    }
-  }
-
-  a > h1 {
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-  .action-link {
-    display: block;
-    width: calc(100% - 3px);
-    height: calc(100% + 40px);
-    margin: -20px;
-    padding: 20px;
-  }
-  .on-edit {
-    width: calc(100% - 35px);
-    display: block;
-  }
-  .actions {
-    opacity: 0.3;
-    transition: all 0.3s ease;
-    width: 100%;
-    background: $primary;
-    padding: 5px 15px;
-    position: absolute;
-    right: 0%;
-    top: 0;
-    width: 40px;
-    height: 100%;
-    button {
-      position: relative;
-      left: -4px;
-      i {
-        color: #fff;
-      }
-    }
-  }
-  &.in_voting {
-    border: 1px solid #8030ff;
-    box-shadow: 0 4px 24px 1px rgba(128, 48, 255, 0.2);
-    .actions {
-      opacity: 1 !important;
-      background: #8030ff;
-    }
-  }
-  &:hover {
-    .actions {
-      opacity: 1 !important;
-      transition: all 0.3s ease;
-      position: absolute;
-    }
-  }
-}
-.con-cards {
-  display: table-cell;
-  vertical-align: middle;
-  margin-right: 20px;
-  img {
-    filter: hue-rotate(-531deg) invert(18%) contrast(110%);
-  }
-}
-@media (max-width: 981px) {
-  .empty-boards {
-    width: 100%;
-  }
-  .container-board {
-    margin: 0;
-  }
-  .title {
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
-    button {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      z-index: 1;
-      font-size: 12px;
-      height: 50px;
-    }
-  }
-}
-</style>

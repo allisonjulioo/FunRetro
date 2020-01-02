@@ -12,7 +12,7 @@ const CardOption = {
 
 export const SyCard = styled('div', CardOption)`
   ${props => (props.clickable
-    ? `cursor: pointer;
+    ? `
   &:active
   {
     border: 1px solid ${bgColor.primary};
