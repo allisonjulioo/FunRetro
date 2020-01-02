@@ -1,14 +1,14 @@
 <template>
   <transition name="modal">
     <div class="modal-backdrop" :class="{'dismiss' : classDismiss }">
-      <sy-card class="modal">
+      <sy-card class="modal" :class="{'center' : center}">
         <header class="modal-header" @click="e => e.stopPropagation()">
           <slot name="header">
             <sy-title>Criar board</sy-title>
-            <button class="modal-close" @click="cancel">
-              <span class="material-icons">close</span>
-            </button>
           </slot>
+          <button class="modal-close" @click="cancel">
+            <span class="material-icons">close</span>
+          </button>
         </header>
         <section class="modal-body">
           <slot name="body">I'm the default body!</slot>
@@ -26,11 +26,12 @@
 
 <script>
 import { SyCard, SyButton, SyTitle } from "@/ui-components";
-import "./Modal.scss"
+import "./Modal.scss";
 export default {
   name: "Modal",
   props: {
-    disableSave: Boolean
+    disableSave: Boolean,
+    center: Boolean
   },
   components: {
     SyCard,

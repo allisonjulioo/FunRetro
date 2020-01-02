@@ -72,6 +72,9 @@
                 <sy-button icon>
                   <i class="material-icons" @click="deleteBoard(board.id)">delete</i>
                 </sy-button>
+                <sy-button icon @click="showModalShare(board)">
+                  <i class="material-icons">share</i>
+                </sy-button>
               </section>
               <!-- On edit          -->
               <section v-if="board.editing">
@@ -86,6 +89,32 @@
           </sy-card>
         </Row>
       </section>
+      <modal
+        v-if="isModalShareVisible"
+        @close="closeModalShare"
+        @cancel="isModalShareVisible = false"
+        :disable-save="false"
+        center
+      >
+        <template v-slot:header>
+          <sy-input full class="mb-10">
+            <label>URL</label>
+            <input type="text" v-model="urlBoard" maxlength="50" />
+          </sy-input>
+        </template>
+        <template v-slot:body>
+          <qrcode-vue
+            level="H"
+            :value="urlBoard"
+            size="300"
+            style="text-align: center"
+            :renderAs="'svg'"
+          ></qrcode-vue>
+        </template>
+        <template v-slot:footer>
+          <sy-button @click="closeModalShare()">Fechar</sy-button>
+        </template>
+      </modal>
       <modal
         v-if="isModalVisible"
         @close="closeModal"
@@ -116,6 +145,7 @@ import TimeLine from "@/components/Timeline/TimeLine";
 import Modal from "@/components/Modal/Modal";
 import boardService from "@/services/boards";
 import "./Boards.scss";
+import QrcodeVue from "qrcode.vue";
 import {
   SyCard,
   Row,
@@ -137,11 +167,13 @@ export default {
     SyTitle,
     SyInput,
     SyContainer,
-    Modal
+    Modal,
+    QrcodeVue
   },
   data() {
     return {
       isModalVisible: false,
+      isModalShareVisible: false,
       board: {
         title: "",
         limit_votes: 6,
@@ -149,7 +181,8 @@ export default {
         editing: false
       },
       boards: [],
-      editMode: false
+      editMode: false,
+      urlBoard: ""
     };
   },
   computed: {
@@ -186,6 +219,15 @@ export default {
         this.getBoards();
         vm.isModalVisible = false;
       });
+    },
+    showModalShare(board) {
+      console.log(window.location);
+
+      this.urlBoard = `${window.location.protocol}//${window.location.host}/board/${board.id}`;
+      this.isModalShareVisible = true;
+    },
+    closeModalShare() {
+      this.isModalShareVisible = false;
     },
     deleteBoard(id) {
       boardService.deleteBoard(id).then(res => {
