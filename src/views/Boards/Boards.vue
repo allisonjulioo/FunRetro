@@ -221,8 +221,6 @@ export default {
       });
     },
     showModalShare(board) {
-      console.log(window.location);
-
       this.urlBoard = `${window.location.protocol}//${window.location.host}/board/${board.id}`;
       this.isModalShareVisible = true;
     },
