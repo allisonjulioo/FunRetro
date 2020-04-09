@@ -1,4 +1,4 @@
-# Bar do Moe
+# Fun Retro
 
 ## Project setup
 ```
