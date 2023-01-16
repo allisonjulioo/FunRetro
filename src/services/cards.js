@@ -17,11 +17,12 @@ export default {
   },
   updateCard: (data) => {
     const params = new URLSearchParams();
+    console.log(data);
     params.append("content", data.content);
     params.append("likes", data.likes);
     return axios({
       method: "patch",
-      url: `${endpoint}/${data.column_id}/cards/${data.id}`,
+      url:`${config.apiUrl}/api/cards/${data.card_id}`,
       data: params,
     })
       .then((response) => response)

@@ -1,10 +1,12 @@
 import axios from 'axios';
 import moment from 'moment';
 import Vue from 'vue';
+import VueSocketIO from 'vue-socket.io';
 import '../variables/animate.scss';
 import App from './App.vue';
 import i18n from './i18n';
 import router from './router';
+import conf from './services/config';
 
 Vue.filter('formatDate', (value) => {
   if (value) {
@@ -13,16 +15,16 @@ Vue.filter('formatDate', (value) => {
 });
 
 Vue.config.productionTip = false;
-// Vue.use(
-//   new VueSocketIO({
-//     debug: true,
-//     connection: conf.apiUrl,
-//     vuex: {
-//       actionPrefix: 'SOCKET_',
-//       mutationPrefix: 'SOCKET_',
-//     },
-//   }),
-// );
+Vue.use(
+  new VueSocketIO({
+    debug: true,
+    connection: conf.apiUrl,
+    vuex: {
+      actionPrefix: 'SOCKET_',
+      mutationPrefix: 'SOCKET_',
+    },
+  }),
+);
 new Vue({
   router,
   i18n,

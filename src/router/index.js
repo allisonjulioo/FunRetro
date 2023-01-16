@@ -44,7 +44,7 @@ const routes = [
 ];
 
 const router = new Router({
-  mode: "history",
+  mode: "hash",
   base: process.env.BASE_URL,
   apiUrl: process.env.VUE_APP_API_URL,
   linkExactActiveClass: "is-active",

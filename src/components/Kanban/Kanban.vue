@@ -2,16 +2,21 @@
   <section>
     <sy-container
       style="text-align: center; margin-top: 60px"
-      v-if="!board.in_voting && user_id_logged != board.user_id"
+      v-if="
+        !board.in_voting && Number(user_id_logged) !== Number(board.user_id)
+      "
     >
       <img src="@/assets/404.png" width="80%" alt style="max-width: 400px" />
       <br />
-      <sy-title>Parece que o board não está disponível</sy-title>
+      <sy-title
+        >Parece que o board não está disponível {{ user_id_logged }} -
+        {{ board }}</sy-title
+      >
       <router-link to="/boards/" :col="3">
         <sy-button>Voltar ao início</sy-button>
       </router-link>
     </sy-container>
-    <div id="board" v-if="board.in_voting || user_id_logged == board.user_id">
+    <div id="board" v-else>
       <div class="header">
         <sy-title primary>
           {{ board.title || "Novo board" }}
@@ -362,6 +367,7 @@ export default {
       const id = this.$route.params.idBoard;
       columnService.getColumns(id).then((res) => {
         this.board = res.data.board;
+        console.log(res.data.board);
         this.columns = res.data.columns;
         this.selectedColumn = this.columns[this.indexColumn || 0];
         let totalCards = 0;
@@ -372,7 +378,7 @@ export default {
           ...this.board,
           user_votes: totalCards,
         };
-        boardService.updateBoard(data);
+        // boardService.updateBoard(data);
       });
     },
     updateColumn(column) {
@@ -403,7 +409,7 @@ export default {
       }
     },
     addLike(card) {
-      card.likes = card.likes + 1;
+      card.likes = card.likes ? card.likes + 1 : 1;
       this.updateCard(card);
     },
     updateCard(card) {
