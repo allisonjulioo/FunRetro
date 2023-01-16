@@ -4,37 +4,39 @@
     <section id="form" v-if="!register" class="animated fadeIn">
       <sy-title style="color: white; text-align: center">Login</sy-title>
       <form method="POST" @submit="login($event)">
-        <sy-input style="margin-bottom: 20px;">
+        <sy-input style="margin-bottom: 20px">
           <label>E-mail</label>
           <input
-           :disabled="loading"
+            :disabled="loading"
             type="email"
             class="animated fast"
             v-model="user.email"
             autofocus="on"
             autocomplete="on"
-            :class="{'hasError shake' : error}"
+            :class="{ 'hasError shake': error }"
           />
           <span class="alert" v-if="error">E-mail inválido</span>
         </sy-input>
         <sy-input>
           <label>Password</label>
           <input
-           :disabled="loading"
+            :disabled="loading"
             type="password"
             class="animated fast"
             v-model="user.password"
-            :class="{'hasError shake' : error}"
+            :class="{ 'hasError shake': error }"
           />
           <span class="alert" v-if="error">Senha inválido</span>
         </sy-input>
         <input type="submit" style="display: none" @submit="login($event)" />
       </form>
       <div class="action-btns">
-        <sy-button :disabled="loading" outline @click="register = !register">Cadastrar</sy-button>
-        <sy-button :disabled="!user.email || loading " @click="login($event)">
+        <sy-button :disabled="loading" outline @click="register = !register"
+          >Cadastrar</sy-button
+        >
+        <sy-button :disabled="!user.email || loading" @click="login($event)">
           <i v-if="loading" class="loading animated material-icons">cached</i>
-          {{loading ?'Aguarde': 'Entrar'}}
+          {{ loading ? "Aguarde" : "Entrar" }}
         </sy-button>
       </div>
     </section>
@@ -58,12 +60,22 @@
           <input
             type="password"
             v-model="user.password"
-            :class="{'hasError':(user.firstPassword.length && user.password.length) && (user.firstPassword != user.password)}"
+            :class="{
+              hasError:
+                user.firstPassword.length &&
+                user.password.length &&
+                user.firstPassword != user.password,
+            }"
           />
           <span
             class="alert"
-            v-if="(user.firstPassword.length && user.password.length) && (user.firstPassword != user.password)"
-          >Senhas não conferem</span>
+            v-if="
+              user.firstPassword.length &&
+              user.password.length &&
+              user.firstPassword != user.password
+            "
+            >Senhas não conferem</span
+          >
         </sy-input>
       </div>
       <div class="action-btns">
@@ -71,10 +83,14 @@
         <sy-button
           @click="signup()"
           :disabled="
-        user.name &&
-        user.email &&
-        (user.firstPassword.length && user.password.length) && (user.firstPassword != user.password)"
-        >Cadastrar</sy-button>
+            user.name &&
+            user.email &&
+            user.firstPassword.length &&
+            user.password.length &&
+            user.firstPassword != user.password
+          "
+          >Cadastrar</sy-button
+        >
       </div>
     </section>
   </div>
@@ -87,7 +103,7 @@ import {
   SyButton,
   SyTitle,
   SyContainer,
-  SyInput
+  SyInput,
 } from "@/ui-components";
 import auth from "@/services/auth";
 import toast from "@/services/toaster";
@@ -101,7 +117,7 @@ export default {
     SyButton,
     SyTitle,
     SyContainer,
-    SyInput
+    SyInput,
   },
   data() {
     return {
@@ -110,11 +126,11 @@ export default {
         name: "",
         email: "",
         password: "",
-        firstPassword: ""
+        firstPassword: "",
       },
       register: false,
       loading: false,
-      vm: Object
+      vm: Object,
     };
   },
   mounted() {
@@ -123,7 +139,7 @@ export default {
   computed: {
     computedProperty() {
       return this.user.firstPassword, this.user.password;
-    }
+    },
   },
   methods: {
     login(e) {
@@ -132,18 +148,18 @@ export default {
       let vm = this;
       auth
         .login(this.user.email, this.user.password)
-        .then(res => {
+        .then((res) => {
           vm.loading = false;
           if (res.data.auth) {
-            localStorage.setItem("uid", res.data.user_id);
+            localStorage.setItem("uid", res.data.id_user);
             localStorage.setItem("uitoken", res.data.token);
-            window.location.href = "/boards";
+            this.$router.push("/boards");
             toast.open("Seja bem vindo!", "success");
           } else {
             vm.alertError();
           }
         })
-        .catch(err => {
+        .catch((err) => {
           vm.loading = false;
           vm.alertError();
         });
@@ -152,9 +168,9 @@ export default {
       const user = {
         name: this.user.name,
         email: this.user.email,
-        password: this.user.password
+        password: this.user.password,
       };
-      auth.signup(user).then(res => {
+      auth.signup(user).then((res) => {
         if (res.data.isValid) {
           this.login();
         }
@@ -167,11 +183,12 @@ export default {
       }, 2000);
       toast.open("Login Invalido", "error");
     },
-    validEmail: function(email) {
-      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    validEmail: function (email) {
+      var re =
+        /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(email);
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>

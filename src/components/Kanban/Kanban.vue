@@ -1,12 +1,12 @@
 <template>
   <section>
     <sy-container
-      style="text-align: center; margin-top: 60px;"
+      style="text-align: center; margin-top: 60px"
       v-if="!board.in_voting && user_id_logged != board.user_id"
     >
-      <img src="@/assets/404.png" width="80%" alt  style="max-width: 400px;" />
+      <img src="@/assets/404.png" width="80%" alt style="max-width: 400px" />
       <br />
-      <sy-title>Parece que o board não está disponíevel</sy-title>
+      <sy-title>Parece que o board não está disponível</sy-title>
       <router-link to="/boards/" :col="3">
         <sy-button>Voltar ao início</sy-button>
       </router-link>
@@ -14,12 +14,11 @@
     <div id="board" v-if="board.in_voting || user_id_logged == board.user_id">
       <div class="header">
         <sy-title primary>
-          {{board.title || 'Novo board'}}
+          {{ board.title || "Novo board" }}
           <br />
-          <sy-title
-            sub
-            style="margin: 0; font-size: 14px;"
-          >Criado em: {{board.created_at | formatDate}}</sy-title>
+          <sy-title sub style="margin: 0; font-size: 14px">
+            Criado em: {{ board.created_at | formatDate }}
+          </sy-title>
         </sy-title>
         <dropdown :toggle-dropdown="isDropdownVisible" v-if="menuBarMobile">
           <template v-slot:button>
@@ -29,18 +28,37 @@
           </template>
           <template v-slot:template>
             <ul class="menu">
-              <li @click="addColumn(); showDropdown()" v-if="columns.length <= 4"><i class="material-icons">add</i> Nova coluna</li>
-              <li @click="createPDF(); showDropdown()"><i class="material-icons">picture_as_pdf</i> Exportar pdf</li>
+              <li
+                @click="
+                  addColumn();
+                  showDropdown();
+                "
+                v-if="columns.length <= 4"
+              >
+                <i class="material-icons">add</i> Nova coluna
+              </li>
+              <li
+                @click="
+                  createPDF();
+                  showDropdown();
+                "
+              >
+                <i class="material-icons">picture_as_pdf</i> Exportar pdf
+              </li>
             </ul>
           </template>
         </dropdown>
-        <div style="display: flex" v-if="!menuBarMobile && board.user_id == user_id_logged">
+        <div
+          style="display: flex"
+          v-if="!menuBarMobile && board.user_id == user_id_logged"
+        >
           <sy-button
             v-if="true"
             @click="addColumn('AddNew')"
             :disabled="columns.length >= 4"
-            :class="{'disabled' : columns.length >= 4}"
-          >Nova coluna</sy-button>
+            :class="{ disabled: columns.length >= 4 }"
+            >Nova coluna</sy-button
+          >
           <sy-button class="pdf" @click="createPDF()" primary>
             <i class="material-icons">picture_as_pdf</i> Exportar pdf
           </sy-button>
@@ -64,7 +82,10 @@
         >
           <div class="title column-drag-handle">
             <sy-title normal class="header-column">
-              <label id="color" v-bind:style="{ backgroundColor : column.color }">
+              <label
+                id="color"
+                v-bind:style="{ backgroundColor: column.color }"
+              >
                 <input
                   v-model="column.color"
                   type="color"
@@ -76,14 +97,25 @@
               <inline-edit
                 :can-edit="board.user_id == user_id_logged"
                 :label="column.title"
-                @lchanged="$event => {column.title = $event; updateColumn(column)}"
+                @lchanged="
+                  ($event) => {
+                    column.title = $event;
+                    updateColumn(column);
+                  }
+                "
                 input
               />
             </sy-title>
             <span class="title">
-              <span>{{columns[index].cards.length != 1 ? columns[index].cards.length + ' cards' : columns[index].cards.length + ' card'}}</span>
+              <span>{{
+                columns[index].cards.length != 1
+                  ? columns[index].cards.length + " cards"
+                  : columns[index].cards.length + " card"
+              }}</span>
               <sy-button icon v-if="board.user_id == user_id_logged">
-                <i class="material-icons" @click="deleteColumn(column)">delete</i>
+                <i class="material-icons" @click="deleteColumn(column)"
+                  >delete</i
+                >
               </sy-button>
             </span>
           </div>
@@ -95,32 +127,44 @@
             :drop-placeholder="dropPlaceholderOptions"
           >
             <Draggable v-for="(card, key) in column.cards" :key="key">
-              <sy-card class="draggable-item" v-bind:style="{ backgroundColor : column.color }">
+              <sy-card
+                class="draggable-item"
+                v-bind:style="{ backgroundColor: column.color }"
+              >
                 <div class="dot-infos">
                   <div class="avatar">
                     <img src="../../assets/avatar.png" width="30" alt />
                     <div class="info">
                       <img src alt />
-                      <span>{{card.user.name}}</span>
+                      <span>{{ card.user.name }}</span>
                     </div>
                   </div>
                 </div>
                 <inline-edit
                   :can-edit="user_id_logged == card.user_id"
                   :label="card.content"
-                  @lchanged="$event =>{ card.content = $event, updateCard(card)}"
+                  @lchanged="
+                    ($event) => {
+                      (card.content = $event), updateCard(card);
+                    }
+                  "
                   :color="'#fff'"
                 />
                 <sy-button
                   v-if="user_id_logged == card.user_id"
                   icon
-                  v-bind:style="{ backgroundColor : column.color + '!important' }"
+                  v-bind:style="{
+                    backgroundColor: column.color + '!important',
+                  }"
                   class="delete"
                 >
                   <i class="material-icons" @click="deleteCard(card)">delete</i>
                 </sy-button>
-                <section class="like" :disabled="card.user_id === user_id_logged">
-                  <b>{{card.likes ? '('+card.likes+')' : ''}}</b>
+                <section
+                  class="like"
+                  :disabled="card.user_id === user_id_logged"
+                >
+                  <b>{{ card.likes ? "(" + card.likes + ")" : "" }}</b>
                   <sy-button outline icon @click="addLike(card)">
                     <i class="material-icons">thumb_up</i>
                   </sy-button>
@@ -131,7 +175,7 @@
             <button
               class="add-task"
               @click="showModal(column)"
-              :style=" menuBarMobile &&{ background: column.color }"
+              :style="menuBarMobile && { background: column.color }"
             >
               <i class="material-icons">add</i>
             </button>
@@ -146,7 +190,7 @@
         <template v-slot:header>
           <label>
             Criar para
-            <strong>{{selectedCard.title}}</strong>
+            <strong>{{ selectedCard.title }}</strong>
           </label>
         </template>
         <template v-slot:body>
@@ -159,8 +203,11 @@
             ></textarea>
             <span
               class="preamble"
-              v-bind:style="[description.length == 50 ? {color : '#ff2948'} : {}]"
-            >{{50 - description.length}} carateres restantes</span>
+              v-bind:style="[
+                description.length == 50 ? { color: '#ff2948' } : {},
+              ]"
+              >{{ 50 - description.length }} carateres restantes</span
+            >
           </sy-input>
         </template>
       </modal>
@@ -169,10 +216,13 @@
           <li v-for="(column, index) in columns" :key="index">
             <button
               @click="selectColumn(column, index)"
-              :class="{'active' : selectedColumn == column}"
+              :class="{ active: selectedColumn == column }"
             >
-              <label id="color" v-bind:style="{ backgroundColor : column.color }"></label>
-              <span>{{column.title}}</span>
+              <label
+                id="color"
+                v-bind:style="{ backgroundColor: column.color }"
+              ></label>
+              <span>{{ column.title }}</span>
             </button>
           </li>
         </ul>
@@ -189,14 +239,13 @@ import {
   SyButton,
   SyTitle,
   SyContainer,
-  SyInput
+  SyInput,
 } from "@/ui-components";
 import Modal from "@/components/Modal/Modal.vue";
 import InlineEdit from "@/components/InlineEdit/InlineEdit.vue";
 import boardService from "@/services/boards";
 import columnService from "@/services/column";
 import cardService from "@/services/cards";
-import userService from "@/services/users";
 import toast from "@/services/toaster";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -214,7 +263,7 @@ export default {
     SyInput,
     Modal,
     InlineEdit,
-    Dropdown
+    Dropdown,
   },
   data() {
     return {
@@ -227,7 +276,7 @@ export default {
       dropPlaceholderOptions: {
         className: "drop-preview",
         animationDuration: "150",
-        showOnTop: true
+        showOnTop: true,
       },
       menuBarMobile: false,
       selectedColumn: {},
@@ -236,15 +285,15 @@ export default {
         title: "",
         created_at: "",
         limit_votes: "",
-        in_voting: false
+        in_voting: false,
       },
-      user_id_logged: localStorage.getItem("uid")
+      user_id_logged: localStorage.getItem("uid"),
     };
   },
   sockets: {
-    socketUpdateColumn: function(data) {
+    socketUpdateColumn: function (data) {
       this.getColumns();
-    }
+    },
   },
   created() {
     localStorage.setItem("bid", this.$route.params.idBoard);
@@ -252,7 +301,7 @@ export default {
     let size = window.innerWidth;
     this.menuBarMobile = size <= 981;
     this.selectedColumn = this.columns[this.indexColumn || 0];
-    window.onresize = function(e) {
+    window.onresize = function (e) {
       let size = window.innerWidth;
       vm.menuBarMobile = size <= 981;
       vm.selectedColumn = vm.columns[vm.indexColumn || 0];
@@ -280,13 +329,13 @@ export default {
       }
       for (let i in this.columns) {
         let dd = [];
-        dd.push(cdrs[i].map(res => res.content));
+        dd.push(cdrs[i].map((res) => res.content));
         let dd3 = [];
         dd3.push([dd[i]]);
 
         doc.autoTable({
           head: [tcards[i]],
-          body: [dd3]
+          body: [dd3],
         });
       }
       doc.save(
@@ -299,10 +348,10 @@ export default {
       const data = {
         title: "Nova coluna",
         color: "#0097ff",
-        id: this.board.id
+        id: this.board.id,
       };
       if (this.columns.length <= 4) {
-        columnService.createColumn(data).then(res => {
+        columnService.createColumn(data).then((res) => {
           toast.open("Coluna criada", "success");
           this.$socket.emit("socketUpdateColumn");
         });
@@ -311,29 +360,29 @@ export default {
     getColumns() {
       let vm = this;
       const id = this.$route.params.idBoard;
-      columnService.getColumns(id).then(res => {
-        this.board = res.data;
+      columnService.getColumns(id).then((res) => {
+        this.board = res.data.board;
         this.columns = res.data.columns;
         this.selectedColumn = this.columns[this.indexColumn || 0];
         let totalCards = 0;
-        this.columns.forEach(column => {
+        this.columns.forEach((column) => {
           totalCards = totalCards + column.cards.length;
         });
         let data = {
           ...this.board,
-          user_votes: totalCards
+          user_votes: totalCards,
         };
         boardService.updateBoard(data);
       });
     },
     updateColumn(column) {
-      columnService.updateColumn(column).then(res => {
+      columnService.updateColumn(column).then((res) => {
         toast.open(res.data.message, "success");
         this.$socket.emit("socketUpdateColumn");
       });
     },
     deleteColumn(column) {
-      columnService.deleteColumn(column).then(res => {
+      columnService.deleteColumn(column).then((res) => {
         toast.open(`Coluna ${column.title} deletada`, "success");
         this.$socket.emit("socketUpdateColumn");
       });
@@ -343,9 +392,9 @@ export default {
         const data = {
           content: this.description,
           board_id: column.board_id,
-          id: column.id
+          id: column.column_id,
         };
-        cardService.createCard(data).then(res => {
+        cardService.createCard(data).then((res) => {
           this.isModalVisible = false;
           toast.open("Card criado", "success");
           this.$socket.emit("socketUpdateColumn");
@@ -358,13 +407,13 @@ export default {
       this.updateCard(card);
     },
     updateCard(card) {
-      cardService.updateCard(card).then(res => {
+      cardService.updateCard(card).then((res) => {
         toast.open("Card atualizado", "success");
         this.$socket.emit("socketUpdateColumn");
       });
     },
     deleteCard(card) {
-      cardService.deleteCard(card).then(res => {
+      cardService.deleteCard(card).then((res) => {
         toast.open("Card deletado", "success");
         this.$socket.emit("socketUpdateColumn");
       });
@@ -393,13 +442,13 @@ export default {
       return this.columns[index].cards[index];
     },
     dragStart(index) {
-      return index
+      return index;
     },
     showModal(column) {
       const newItems = [...this.columns];
       this.index = newItems.indexOf(column);
       (this.selectedCard = column), (this.isModalVisible = true);
-    }
-  }
+    },
+  },
 };
 </script>

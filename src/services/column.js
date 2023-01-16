@@ -1,46 +1,48 @@
-import config from '@/services/config'
-import axios from 'axios'
-const user_id = localStorage.getItem('uid')
-const endpoint = `${config.apiUrl}/api/users/${user_id}/boards`
+import config from "@/services/config";
+import axios from "axios";
+const user_id = localStorage.getItem("uid");
+const board_id = localStorage.getItem("bid");
+const endpoint = `${config.apiUrl}/api/columns/${user_id}`;
+
 export default {
-  getColumns: board_id => {
+  getColumns: () => {
     return axios({
-      method: 'get',
-      url: `${endpoint}/${board_id}/columns`
+      method: "get",
+      url: `${endpoint}/${board_id}`,
     })
-      .then(response => response)
-      .catch(error => error)
+      .then((response) => response)
+      .catch((error) => error);
   },
-  createColumn: data => {
-    const params = new URLSearchParams()
-    params.append('title', data.title)
-    params.append('color', data.color)
+  createColumn: (data) => {
+    const params = new URLSearchParams();
+    params.append("title", data.title);
+    params.append("color", data.color);
     return axios({
-      method: 'post',
+      method: "post",
       url: `${endpoint}/${data.id}/columns`,
-      data: params
+      data: params,
     })
-      .then(response => response)
-      .catch(error => error)
+      .then((response) => response)
+      .catch((error) => error);
   },
-  updateColumn: data => {
-    const params = new URLSearchParams()
-    params.append('title', data.title)
-    params.append('color', data.color)
+  updateColumn: (data) => {
+    const params = new URLSearchParams();
+    params.append("title", data.title);
+    params.append("color", data.color);
     return axios({
-      method: 'patch',
+      method: "patch",
       url: `${endpoint}/${data.board_id}/columns/${data.id}`,
-      data: params
+      data: params,
     })
-      .then(response => response)
-      .catch(error => error)
+      .then((response) => response)
+      .catch((error) => error);
   },
-  deleteColumn: data => {
+  deleteColumn: (data) => {
     return axios({
-      method: 'delete',
+      method: "delete",
       url: `${endpoint}/${data.board_id}/columns/${data.id}`,
     })
-      .then(response => response)
-      .catch(error => error)
-  }
-}
+      .then((response) => response)
+      .catch((error) => error);
+  },
+};

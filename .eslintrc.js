@@ -3,23 +3,23 @@ module.exports = {
   env: {
     node: true,
   },
-  extends: [
-    'plugin:vue/essential',
-    '@vue/airbnb',
-  ],
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'import/prefer-default-export': 'off',
+    "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
+    "vue/no-deprecated-filter": process.env.NODE_ENV === "production" ? "error" : "off",
   },
   parserOptions: {
-    parser: 'babel-eslint',
+    sourceType: "module",
   },
+
+  env: {
+    es6: true,
+  },
+  parser: "babel-eslint",
   overrides: [
     {
       files: [
-        '**/__tests__/*.{j,t}s?(x)',
-        '**/tests/unit/**/*.spec.{j,t}s?(x)',
+        "**/__tests__/*.{j,t}s?(x)",
+        "**/tests/unit/**/*.spec.{j,t}s?(x)",
       ],
       env: {
         jest: true,

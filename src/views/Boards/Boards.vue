@@ -8,8 +8,16 @@
           <sy-button @click="showModal">+ Novo board</sy-button>
         </sy-title>
         <Row>
-          <sy-container style="text-align: center; margin-top: 60px;" v-if="!boards.length">
-            <img src="@/assets/empty.png" width="80%" alt style="max-width: 400px;" />
+          <sy-container
+            style="text-align: center; margin-top: 60px"
+            v-if="!boards.length"
+          >
+            <img
+              src="@/assets/empty.png"
+              width="80%"
+              alt
+              style="max-width: 400px"
+            />
             <br />
             <sy-title>Parece que não há nada por aqui!</sy-title>
             <sy-button @click="showModal">Adicione um novo board</sy-button>
@@ -20,19 +28,19 @@
             class="boards"
             v-for="(board, index) in boards"
             :key="index"
-            :class="{'editing' : board.editing}"
+            :class="{ editing: board.editing }"
           >
             <router-link
               v-if="!board.editing"
               class="action-link"
-              :to="'/board/'+ board.id"
+              :to="'/board/' + board.id"
               :col="3"
             >
-              <sy-title black normal>{{board.title}}</sy-title>
+              <sy-title black normal>{{ board.title }}</sy-title>
             </router-link>
             <sy-title black normal sub>
               Votos
-              <b>{{board.user_votes}}</b>
+              <b>{{ board.user_votes }}</b>
             </sy-title>
             <sy-input class="checkbox" :for="board.id">
               <input
@@ -47,10 +55,10 @@
             </sy-input>
             <sy-title black normal sub class="f-2" style="white-space: nowrap">
               <i class="material-icons mr-2">date_range</i>
-              {{board.created_at | formatDate}}
-              <span
-                class="span-my-retros"
-              >{{ board.in_voting ? '-Em votação' : ''}}</span>
+              {{ board.created_at | formatDate }}
+              <span class="span-my-retros">{{
+                board.in_voting ? "-Em votação" : ""
+              }}</span>
             </sy-title>
             <sy-input v-if="board.editing" class="on-edit">
               <label>Nome</label>
@@ -60,7 +68,11 @@
             </sy-input>
             <div class="actions">
               <!-- Default          -->
-              <router-link v-if="!board.editing" :to="'/board/'+ board.id" :col="3">
+              <router-link
+                v-if="!board.editing"
+                :to="'/board/' + board.board_id"
+                :col="3"
+              >
                 <sy-button icon>
                   <i class="material-icons">play_circle_filled</i>
                 </sy-button>
@@ -70,7 +82,9 @@
                   <i class="material-icons">edit</i>
                 </sy-button>
                 <sy-button icon>
-                  <i class="material-icons" @click="deleteBoard(board.id)">delete</i>
+                  <i class="material-icons" @click="deleteBoard(board.id)"
+                    >delete</i
+                  >
                 </sy-button>
                 <sy-button icon @click="showModalShare(board)">
                   <i class="material-icons">share</i>
@@ -127,8 +141,11 @@
             <input type="text" v-model.trim="board.title" maxlength="50" />
             <span
               class="preamble"
-              v-bind:style="[board.title.length == 50 ? {color : '#ff2948'} : {}]"
-            >{{50 - board.title.length}} carateres restantes</span>
+              v-bind:style="[
+                board.title.length == 50 ? { color: '#ff2948' } : {},
+              ]"
+              >{{ 50 - board.title.length }} carateres restantes</span
+            >
           </sy-input>
           <sy-input pre-left class="mb-10">
             <label>Votos por usuário</label>
@@ -153,7 +170,7 @@ import {
   SyButton,
   SyTitle,
   SyContainer,
-  SyInput
+  SyInput,
 } from "@/ui-components";
 
 export default {
@@ -168,7 +185,7 @@ export default {
     SyInput,
     SyContainer,
     Modal,
-    QrcodeVue
+    QrcodeVue,
   },
   data() {
     return {
@@ -178,32 +195,33 @@ export default {
         title: "",
         limit_votes: 6,
         in_voting: false,
-        editing: false
+        editing: false,
       },
       boards: [],
       editMode: false,
-      urlBoard: ""
+      urlBoard: "",
     };
   },
   computed: {
-    load: async function() {
+    load: async function () {
       await this.getBoards();
-    }
+    },
   },
   mounted() {
     this.load;
   },
   sockets: {
-    connect: function() {}
+    connect: function () {},
   },
   methods: {
     getBoards() {
       let vm = this;
-      boardService.getBoards().then(res => {
-        for (let board of res.data) {
+      boardService.getBoards().then((res) => {
+        const boards = res.data.boards;
+        for (let board of boards) {
           Object.assign(board, { editing: false });
         }
-        vm.boards = res.data || [];
+        vm.boards = boards || [];
       });
     },
     showModal() {
@@ -213,9 +231,9 @@ export default {
       let vm = this;
       const data = {
         title: this.board.title,
-        limit_votes: this.board.limit_votes
+        limit_votes: this.board.limit_votes,
       };
-      boardService.createBoard(data).then(res => {
+      boardService.createBoard(data).then((res) => {
         this.getBoards();
         vm.isModalVisible = false;
       });
@@ -228,15 +246,15 @@ export default {
       this.isModalShareVisible = false;
     },
     deleteBoard(id) {
-      boardService.deleteBoard(id).then(res => {
+      boardService.deleteBoard(id).then((res) => {
         this.getBoards();
       });
     },
     editBoard(board) {
-      boardService.updateBoard(board).then(res => {
+      boardService.updateBoard(board).then((res) => {
         this.getBoards();
       });
-    }
-  }
+    },
+  },
 };
 </script>
