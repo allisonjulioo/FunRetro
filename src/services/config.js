@@ -1,4 +1,3 @@
 export default {
-  // apiUrl: 'https://api-fun-retro.herokuapp.com'
-  apiUrl: 'http://localhost:8000'
-}
+  apiUrl: process.env.VUE_APP_API_URL,
+};
