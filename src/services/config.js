@@ -1,4 +1,4 @@
 export default {
-  // apiUrl: 'https://api-sympla-retro.herokuapp.com'
+  // apiUrl: 'https://api-fun-retro.herokuapp.com'
   apiUrl: 'http://localhost:8000'
 }

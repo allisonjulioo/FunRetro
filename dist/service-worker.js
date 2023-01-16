@@ -17,7 +17,7 @@ importScripts(
   "/precache-manifest.3ed3dcb0aa2f2c419ee56449d140e4cc.js"
 );
 
-workbox.core.setCacheNameDetails({prefix: "sympla-retro"});
+workbox.core.setCacheNameDetails({prefix: "fun-retro"});
 
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
